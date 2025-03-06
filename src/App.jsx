@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import Home from './pages/Home' 
 import Admin from './pages/Admin' 
 import Card from './components/Card/Card.jsx'
+import ProtectedRoute from "./components/Authentication/ProtectedRoute.jsx";
 
 const theme = createTheme({
   palette: {
@@ -46,9 +47,21 @@ const App = () => {
         <Root>
           <Content>
             <Routes>
+              
               <Route path="/" element={<Home />} />
-              <Route path="/admin" element={<Admin />} />
+
               <Route path="/card" element={<Card />} />
+
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute role="admin">
+                    <AdminPanel />
+                  </ProtectedRoute>
+                }
+              />
+
+
             </Routes>
           </Content>
         </Root>
