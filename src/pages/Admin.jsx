@@ -4,7 +4,7 @@ import { Box, Typography } from '@mui/material'
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-function Admin() {
+const Admin = () => {
   return (
     <Box display="flex" flexDirection="column" alignItems="center" width="100%">
       <Typography variant="h3" component="h1">Admin</Typography>

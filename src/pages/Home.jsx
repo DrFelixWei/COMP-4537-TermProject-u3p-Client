@@ -20,7 +20,7 @@ const PageLink = styled('a')(({ theme }) => ({
   },
 }))
 
-function Home() {
+const Home = () => {
   return (
     <Box display="flex" flexDirection="column" alignItems="center" width="100%">
       <Typography variant="h3" component="h1">Home</Typography>

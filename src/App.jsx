@@ -38,7 +38,7 @@ const Content = styled(Box)(({ theme }) => ({
   padding: theme.spacing(3),
 }))
 
-function App() {
+const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
