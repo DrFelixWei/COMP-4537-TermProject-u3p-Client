@@ -7,7 +7,7 @@ import { AuthProvider } from "react-auth-kit";
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider
-      authType={"cookie"} // "cookie", "localstorage", or "sessionstorage"
+      authType={"cookie"}
       authName={"_auth"} 
       cookieDomain={window.location.hostname}
       cookieSecure={window.location.protocol === "https:"}

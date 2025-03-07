@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import sfxFlip from './sfx_card_flip_2.mp3';
 import './Card.css';
 
-const Card = (
+const Card = ({
     length = 336,
     width = 240,
     faceImg,
@@ -11,7 +11,7 @@ const Card = (
     backBackgroundColor = 'darkblue',
     value,
     flipTimer, 
-) => {
+}) => {
     const [isFaceActive, setIsFaceActive] = useState(false);
     const [isFlippingAnimation, setIsFlippingAnimation] = useState(false);
     const autoFlipTimerRef = useRef(null); // Ref to track the auto-flip timeout

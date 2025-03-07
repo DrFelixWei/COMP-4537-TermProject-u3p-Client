@@ -1,5 +1,7 @@
 import { useSignOut } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@mui/material";
+
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const Logout = () => {
@@ -10,17 +12,21 @@ const Logout = () => {
     try {
       await fetch(`${backendUrl}/api/auth/logout`, {
         method: "POST",
-        credentials: "include", // Send request to clear cookie on the server
+        credentials: "include",
       });
 
-      signOut(); // Remove auth state from react-auth-kit
+      signOut();
       navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);
     }
   };
 
-  return <button onClick={handleLogout}>Logout</button>;
+  return (
+    <Button variant="contained" color="secondary" onClick={handleLogout}>
+      Logout
+    </Button>
+  );
 };
 
 export default Logout;

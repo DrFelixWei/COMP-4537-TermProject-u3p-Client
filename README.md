@@ -12,6 +12,8 @@ https://comp-4537-termproject-u3p.netlify.app/
 
 ## Local Testing
 npm run dev -> localhost:5173
+or
+yarn dev -> localhost:5173
 
 ## Features
 

@@ -1,51 +1,72 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import { useSignIn } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
-import { Box, Typography } from '@mui/material'
-// import { styled } from '@mui/material/styles'
+import {
+  Container,
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  Alert,
+} from "@mui/material";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const Login = () => {
   const signIn = useSignIn();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
 
     try {
       const response = await fetch(`${backendUrl}/api/auth/login`, {
         method: "POST",
-        credentials: "include", 
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
 
-      // Save token & user data in a cookie
       signIn({
-        token: data.token, // Token received from the API
-        expiresIn: 3600, // 1 hour expiration
-        tokenType: "Bearer", // Usually "Bearer"
-        authState: { id: data.user.id, name: data.user.name, role: data.user.role }, // Save user info
+        token: data.token,
+        expiresIn: 3600,
+        tokenType: "Bearer",
+        authState: { id: data.user.id, name: data.user.name, role: data.user.role },
       });
 
       navigate("/dashboard");
     } catch (error) {
-      console.error("Login failed:", error);
+      setError(error.message);
     }
   };
 
   return (
-    <form onSubmit={handleLogin}>
-      <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-      <button type="submit">Login</button>
-    </form>
+    <Container maxWidth="xs">
+      <Paper elevation={3} sx={{ p: 3, mt: 5 }}>
+        <Typography variant="h5" gutterBottom>
+          Login
+        </Typography>
+        {error && <Alert severity="error">{error}</Alert>}
+        <Box component="form" onSubmit={handleLogin} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <TextField label="Email" type="email" name="email" value={formData.email} onChange={handleChange} required />
+          <TextField label="Password" type="password" name="password" value={formData.password} onChange={handleChange} required />
+          <Button type="submit" variant="contained" color="primary" fullWidth>
+            Login
+          </Button>
+        </Box>
+      </Paper>
+    </Container>
   );
 };
 

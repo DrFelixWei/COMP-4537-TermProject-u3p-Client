@@ -1,8 +1,17 @@
 import { useSignIn } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+import {
+  Container,
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  Alert,
+} from "@mui/material";
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const Signup = () => {
   const signIn = useSignIn();
@@ -40,7 +49,7 @@ const Signup = () => {
     try {
       const response = await fetch(`${backendUrl}/api/auth/signup`, {
         method: "POST",
-        credentials: "include", // needed for cookies
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
@@ -55,55 +64,30 @@ const Signup = () => {
         authState: { id: data.user.id, name: data.user.name, role: data.user.role },
       });
 
-      navigate("/dashboard"); // Redirect to dashboard after signup
+      navigate("/dashboard");
     } catch (error) {
       setError(error.message);
     }
   };
 
   return (
-    <form onSubmit={handleSignup}>
-      <h2>Sign Up</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <input
-        type="text"
-        name="name"
-        placeholder="Full Name"
-        value={formData.name}
-        onChange={handleChange}
-        required
-      />
-
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        value={formData.email}
-        onChange={handleChange}
-        required
-      />
-
-      <input
-        type="email"
-        name="confirmEmail"
-        placeholder="Confirm Email"
-        value={formData.confirmEmail}
-        onChange={handleChange}
-        required
-      />
-
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        value={formData.password}
-        onChange={handleChange}
-        required
-      />
-
-      <button type="submit">Sign Up</button>
-    </form>
+    <Container maxWidth="xs">
+      <Paper elevation={3} sx={{ p: 3, mt: 5 }}>
+        <Typography variant="h5" gutterBottom>
+          Sign Up
+        </Typography>
+        {error && <Alert severity="error">{error}</Alert>}
+        <Box component="form" onSubmit={handleSignup} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <TextField label="Full Name" name="name" value={formData.name} onChange={handleChange} required />
+          <TextField label="Email" type="email" name="email" value={formData.email} onChange={handleChange} required />
+          <TextField label="Confirm Email" type="email" name="confirmEmail" value={formData.confirmEmail} onChange={handleChange} required />
+          <TextField label="Password" type="password" name="password" value={formData.password} onChange={handleChange} required />
+          <Button type="submit" variant="contained" color="primary" fullWidth>
+            Sign Up
+          </Button>
+        </Box>
+      </Paper>
+    </Container>
   );
 };
 
