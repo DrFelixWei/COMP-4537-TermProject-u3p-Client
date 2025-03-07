@@ -4,9 +4,10 @@ import { styled, ThemeProvider, createTheme } from '@mui/material/styles'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import Home from './pages/Home' 
 import Admin from './pages/Admin' 
+import Dashboard from './pages/Dashboard' 
+
 import ProtectedRoute from "./components/Authentication/ProtectedRoute.jsx";
-import Login from './components/Authentication/Login.jsx' 
-import Signup from './components/Authentication/Signup.jsx' 
+
 
 const theme = createTheme({
   palette: {
@@ -50,9 +51,10 @@ const App = () => {
             <Routes>
               
               <Route path="/" element={<Home />} />
+              <Route path="/dashboard" element={<Dashboard />} />
 
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+
+
 
 
 
