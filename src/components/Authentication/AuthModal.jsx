@@ -36,7 +36,7 @@ const AuthModal = ({ isOpen, setIsOpen }) => {
     }
 
     try {
-      const endpoint = showSignup ? "/api/auth/signup" : "/api/auth/login";
+      const endpoint = showSignup ? "/api/users/register" : "/api/users/login";
       const body = showSignup ? { name: formData.name, email: formData.email, password: formData.password } : { email: formData.email, password: formData.password };
       
       const response = await fetch(`${backendUrl}${endpoint}`, {
@@ -47,13 +47,14 @@ const AuthModal = ({ isOpen, setIsOpen }) => {
       });
       
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Authentication failed");
+      if (!response.ok) throw new Error(data.error || "Authentication failed"); 
 
       signIn({
         token: data.token,
         expiresIn: 3600,
         tokenType: "Bearer",
-        authState: { id: data.user.id, name: data.user.name, role: data.user.role },
+        authState: null, // No user info is available
+        // authState: { id: data.user.id, name: data.user.name, role: data.user.role },
       });
 
       navigate("/dashboard");
