@@ -18,13 +18,15 @@ const Navbar = () => {
             MyApp
           </Typography>
 
-          <Button color="inherit" component={Link} to="/">
-            Home
-          </Button>
-
+          {auth() ? (
           <Button color="inherit" component={Link} to="/dashboard">
             Dashboard
           </Button>
+          ) : (
+            <Button color="inherit" component={Link} to="/">
+              Home
+            </Button>
+          )}
 
           {auth() ? (
             <Box sx={{ display: "flex", gap: 2 }}>
