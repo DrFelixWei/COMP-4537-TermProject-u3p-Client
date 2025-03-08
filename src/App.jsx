@@ -12,13 +12,26 @@ import ProtectedRoute from "./components/Authentication/ProtectedRoute.jsx";
 const theme = createTheme({
   palette: {
     background: {
-      default: '#0c2830',
+      default: '#0c2830',  // Deep teal
+      primary: '#174a5c',  // Darker blue-teal for sections
+      secondary: '#122b36',  // Even darker teal for contrast
     },
     text: {
-      primary: '#F5F5F5',
+      primary: '#F5F5F5',  // White for readability
+      secondary: '#A3C1C7',  // Muted cyan for soft contrast
+    },
+    primary: {
+      main: '#38A3A5',  // Soft cyan-green for highlights
+    },
+    secondary: {
+      main: '#E85D04',  // Warm orange for accents
+    },
+    accent: {
+      main: '#F2C14E',  // Golden yellow for highlights
     },
   },
-})
+});
+
 
 const Root = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -52,26 +65,11 @@ const App = () => {
             <NavBar/>
 
             <Routes>
-              
               <Route path="/" element={<Home />} />
               <Route path="/dashboard" element={<Dashboard />} />
-
-
-
-
-
-
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute role="admin">
-                    <Admin />
-                  </ProtectedRoute>
-                }
-              />
-
-
+              <Route path="/admin" element={<ProtectedRoute role="admin"><Admin/></ProtectedRoute>}/>
             </Routes>
+            
           </Content>
         </Root>
       </Router>

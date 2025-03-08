@@ -1,14 +1,13 @@
 import { useAuthUser } from "react-auth-kit";
 import { Link } from "react-router-dom";
 import Logout from "../Authentication/Logout";
-import Login from "../Authentication/Login"; // Import Login component
-import { AppBar, Toolbar, Button, Box, Typography, Dialog, IconButton } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close"; // Close button for modal
+import { AppBar, Toolbar, Button, Box, Typography } from "@mui/material";
 import { useState } from "react";
+import AuthModal from "../Authentication/AuthModal";
 
 const Navbar = () => {
   const auth = useAuthUser(); // Get user data
-  const [open, setOpen] = useState(false); // State for login modal
+  const [loginOpen, setLoginOpen] = useState(false); 
 
   return (
     <>
@@ -38,22 +37,19 @@ const Navbar = () => {
               <Logout />
             </Box>
           ) : (
-            <Button color="inherit" onClick={() => setOpen(true)}>
+            <Button color="inherit" onClick={() => setLoginOpen(true)}>
               Login
             </Button>
           )}
         </Toolbar>
       </AppBar>
 
-      {/* Login Modal */}
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
-        <Box sx={{ display: "flex", justifyContent: "flex-end", p: 1 }}>
-          <IconButton onClick={() => setOpen(false)}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-        <Login />
-      </Dialog>
+      <AuthModal
+        isOpen={loginOpen} 
+        setIsOpen={setLoginOpen}
+      />
+
+
     </>
   );
 };
