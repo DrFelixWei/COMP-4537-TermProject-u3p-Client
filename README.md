@@ -8,7 +8,7 @@ Group u3p
 - Yuzhi (Olivia) Li
 
 ## Hosting
-https://comp-4537-termproject-u3p.netlify.app/
+https://comp-4537-termproject-u3p.netlify.app
 
 ## Local Testing
 npm run dev -> localhost:5173
