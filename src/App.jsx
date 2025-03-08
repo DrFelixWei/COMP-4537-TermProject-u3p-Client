@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import Home from './pages/Home' 
 import Admin from './pages/Admin' 
 import Dashboard from './pages/Dashboard' 
-
+import NavBar from './components/Navbar/Navbar.jsx'
 import ProtectedRoute from "./components/Authentication/ProtectedRoute.jsx";
 
 
@@ -48,6 +48,9 @@ const App = () => {
       <Router>
         <Root>
           <Content>
+
+            <NavBar/>
+
             <Routes>
               
               <Route path="/" element={<Home />} />
