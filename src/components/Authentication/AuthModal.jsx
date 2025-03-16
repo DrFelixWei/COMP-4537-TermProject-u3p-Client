@@ -53,8 +53,8 @@ const AuthModal = ({ isOpen, setIsOpen }) => {
         token: data.token,
         expiresIn: 3600,
         tokenType: "Bearer",
-        authState: null, // No user info is available
-        // authState: { id: data.user.id, name: data.user.name, role: data.user.role },
+        // authState: null, // No user info is available
+        authState: { id: data.user.id, name: data.user.name, role: data.user.role },
       });
 
       navigate("/dashboard");
