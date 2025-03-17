@@ -5,7 +5,7 @@ import { Box, Typography, Dialog, DialogContent, IconButton, TextField, Button, 
 import { useTheme } from '@mui/material/styles';
 import CloseIcon from "@mui/icons-material/Close";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const AuthModal = ({ isOpen, setIsOpen }) => {
   const theme = useTheme();

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Box, Typography, Button, LinearProgress, Alert } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000"; // NOTE: Created fall back
+
 
 const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -42,6 +43,7 @@ const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
       if (!response.ok) {
         throw new Error('Failed to upload PDF and generate flashcards');
       }
+      console.log("Response:", response);
       
       const data = await response.json();
       setProgress('Flashcards created successfully!');
