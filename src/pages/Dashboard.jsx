@@ -30,7 +30,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
 
 const Dashboard = () => {
   const [flashcards, setFlashcards] = useState([]);
-  const [userEmail, setUserEmail] = useState('olivia@gmail.com'); // Replace with actual user email from auth context
+  const [userEmail, setUserEmail] = useState('test@example.com'); // NOTE: Replace with actual user email from auth context
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   
   const handleFlashcardsGenerated = (newFlashcards) => {
