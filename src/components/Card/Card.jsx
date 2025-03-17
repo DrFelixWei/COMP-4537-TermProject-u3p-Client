@@ -12,7 +12,7 @@ const Card = ({
     value,
     flipTimer, 
 }) => {
-    const [isFaceActive, setIsFaceActive] = useState(false);
+    const [isFaceActive, setIsFaceActive] = useState(true);
     const [isFlippingAnimation, setIsFlippingAnimation] = useState(false);
     const autoFlipTimerRef = useRef(null); // Ref to track the auto-flip timeout
 
@@ -69,7 +69,7 @@ const Card = ({
                     height: `${length}px`,
                 }}
             >
-                {/* Front Face */}
+                {/* Front Face - Question */}
                 <div
                     className="card-face front"
                     style={{
@@ -77,12 +77,24 @@ const Card = ({
                         backgroundImage: `url(${faceImg})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        padding: '20px',
+                        textAlign: 'center',
+                        overflow: 'auto'
                     }}
                 >
-                    {/* Additional front content */}
+                    {value && value.front && (
+                        <div className="card-content">
+                            <h3 style={{ color: 'white', marginBottom: '10px' }}>Question</h3>
+                            <p style={{ color: 'white', fontSize: '16px' }}>{value.front}</p>
+                        </div>
+                    )}
                 </div>
 
-                {/* Back Face */}
+                {/* Back Face - Answer */}
                 <div
                     className="card-face back"
                     style={{
@@ -90,9 +102,21 @@ const Card = ({
                         backgroundImage: `url(${backImg})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        padding: '20px',
+                        textAlign: 'center',
+                        overflow: 'auto'
                     }}
                 >
-                    {/* Additional back content */}
+                    {value && value.back && (
+                        <div className="card-content">
+                            <h3 style={{ color: 'white', marginBottom: '10px' }}>Answer</h3>
+                            <p style={{ color: 'white', fontSize: '16px' }}>{value.back}</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
@@ -100,4 +124,3 @@ const Card = ({
 }
 
 export default Card;
-
