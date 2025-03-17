@@ -3,6 +3,7 @@ import { Box, Typography, Container, Paper, Divider, Button } from '@mui/materia
 import { styled } from '@mui/material/styles';
 import Card from "../components/Card/Card.jsx";
 import PDFUpload from "../components/PDFUpload/PDFUpload";
+import { useAuthUser } from 'react-auth-kit';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
@@ -29,10 +30,13 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 const Dashboard = () => {
+  const auth = useAuthUser();
+  const user = auth(); 
+  const userEmail = user?.email || 'test@example.com';
+
   const [flashcards, setFlashcards] = useState([]);
-  const [userEmail, setUserEmail] = useState('test@example.com'); // NOTE: Replace with actual user email from auth context
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  
+
   const handleFlashcardsGenerated = (newFlashcards) => {
     setFlashcards(newFlashcards);
     setCurrentCardIndex(0);
