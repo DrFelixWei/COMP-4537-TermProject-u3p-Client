@@ -11,6 +11,7 @@ import {
   Alert,
   Paper
 } from '@mui/material';
+import { useAuthHeader } from 'react-auth-kit';  // This will help retrieve the token
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -19,12 +20,18 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Fetch token from react-auth-kit
+  const authHeader = useAuthHeader();  // This hook provides the Authorization header
+  
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const res = await fetch(`${backendUrl}/api/admin/getUsers`, {
           method: 'GET',
-          credentials: 'include', 
+          headers: {
+            'Authorization': authHeader(),  // Automatically adds 'Bearer {token}' to the header
+          },
+          credentials: 'include', // In case you also want to send cookies
         });
 
         const data = await res.json();
@@ -41,7 +48,7 @@ const Admin = () => {
     };
 
     fetchUsers();
-  }, []);
+  }, [authHeader]);  // Dependency array now includes authHeader to ensure the token is updated
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" width="100%" p={4}>
