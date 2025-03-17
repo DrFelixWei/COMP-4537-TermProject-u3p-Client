@@ -1,19 +1,81 @@
-import React from 'react'
-import { Box, Typography } from '@mui/material'
-// import { styled } from '@mui/material/styles'
+import React, { useEffect, useState } from 'react';
+import {
+  Box,
+  Typography,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  CircularProgress,
+  Alert,
+  Paper
+} from '@mui/material';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const Admin = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch(`${backendUrl}/api/admin/getUsers`, {
+          method: 'GET',
+          credentials: 'include', 
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || 'Failed to fetch users');
+        }
+
+        setUsers(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" width="100%">
-      <Typography variant="h3" component="h1">Admin</Typography>
+    <Box display="flex" flexDirection="column" alignItems="center" width="100%" p={4}>
+      <Typography variant="h4" gutterBottom>Admin Panel</Typography>
 
-      {/* A table to view and edit user accounts */}
-      <Typography variant="h3" component="h1">{backendUrl}</Typography>
+      {loading && <CircularProgress />}
+      {error && <Alert severity="error">{error}</Alert>}
 
+      {!loading && !error && (
+        <Paper sx={{ width: '100%', overflowX: 'auto', mt: 2 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Role</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>{user.id}</TableCell>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.role}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      )}
     </Box>
-  )
-}
+  );
+};
 
-export default Admin
+export default Admin;
