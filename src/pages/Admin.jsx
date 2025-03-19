@@ -40,7 +40,8 @@ const Admin = () => {
           throw new Error(data.error || 'Failed to fetch users');
         }
 
-        setUsers([data]);
+        // Ensure that data is always an array
+        setUsers(Array.isArray(data) ? data : [data]);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -71,12 +72,12 @@ const Admin = () => {
             </TableHead>
 
             <TableBody>
-              {!users || users.length === 0 && (
+              {users.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={4} align="center">No users found.</TableCell>
                 </TableRow>
               )}
-              {users && users.length > 0 && users.map((user) => (
+              {users.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>{user.id}</TableCell>
                   <TableCell>{user.name}</TableCell>
