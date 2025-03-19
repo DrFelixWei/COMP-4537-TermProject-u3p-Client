@@ -31,6 +31,7 @@ const Admin = () => {
           headers: {
             'Authorization': authHeader(),  // Automatically adds 'Bearer {token}' to the header
           },
+          role: 'admin',
           credentials: 'include', // In case you also want to send cookies
         });
 
