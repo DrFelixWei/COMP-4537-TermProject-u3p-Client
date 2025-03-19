@@ -64,10 +64,10 @@ const Admin = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Role</TableCell>
+                <TableCell sx={{ color: 'black' }}>ID</TableCell>
+                <TableCell sx={{ color: 'black' }}>Name</TableCell>
+                <TableCell sx={{ color: 'black' }}>Email</TableCell>
+                <TableCell sx={{ color: 'black' }}>Role</TableCell>
               </TableRow>
             </TableHead>
 
@@ -79,10 +79,10 @@ const Admin = () => {
               )}
               {users.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell>{user.id}</TableCell>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.role}</TableCell>
+                  <TableCell sx={{ color: 'black' }}>{user.id}</TableCell>
+                  <TableCell sx={{ color: 'black' }}>{user.name}</TableCell>
+                  <TableCell sx={{ color: 'black' }}>{user.email}</TableCell>
+                  <TableCell sx={{ color: 'black' }}>{user.role}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
