@@ -30,8 +30,8 @@ const Admin = () => {
           method: 'GET',
           headers: {
             'Authorization': authHeader(),  // Automatically adds 'Bearer {token}' to the header
+            'X-User-Role': 'admin',
           },
-          role: 'admin',
           credentials: 'include', // In case you also want to send cookies
         });
 
