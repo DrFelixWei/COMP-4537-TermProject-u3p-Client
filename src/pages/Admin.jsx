@@ -11,7 +11,7 @@ import {
   Alert,
   Paper
 } from '@mui/material';
-import { useAuthHeader } from 'react-auth-kit';  // This will help retrieve the token
+import { useAuthHeader } from 'react-auth-kit';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -20,13 +20,9 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    console.log(users);
-  }, [users]);
-
   // Fetch token from react-auth-kit
   const authHeader = useAuthHeader();  // This hook provides the Authorization header
-  
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -53,7 +49,7 @@ const Admin = () => {
     };
 
     fetchUsers();
-  }, [authHeader]);  // Dependency array now includes authHeader to ensure the token is updated
+  }, []);  // Only run this effect once on mount
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" width="100%" p={4}>
@@ -74,18 +70,21 @@ const Admin = () => {
               </TableRow>
             </TableHead>
 
-            {users && users.length === 0 && (
-              <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>{user.id}</TableCell>
-                    <TableCell>{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.role}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            )}
+            <TableBody>
+              {users.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={4} align="center">No users found.</TableCell>
+                </TableRow>
+              )}
+              {users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>{user.id}</TableCell>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.role}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
           </Table>
         </Paper>
       )}
