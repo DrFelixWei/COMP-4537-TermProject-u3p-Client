@@ -20,6 +20,10 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    console.log(users);
+  }, [users]);
+
   // Fetch token from react-auth-kit
   const authHeader = useAuthHeader();  // This hook provides the Authorization header
   
