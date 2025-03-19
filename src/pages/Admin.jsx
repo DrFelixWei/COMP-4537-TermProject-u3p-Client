@@ -40,7 +40,7 @@ const Admin = () => {
           throw new Error(data.error || 'Failed to fetch users');
         }
 
-        setUsers(data);
+        setUsers([data]);
       } catch (err) {
         setError(err.message);
       } finally {
