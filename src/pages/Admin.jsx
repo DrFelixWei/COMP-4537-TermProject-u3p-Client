@@ -71,12 +71,12 @@ const Admin = () => {
             </TableHead>
 
             <TableBody>
-              {users.length === 0 && (
+              {!users || users.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={4} align="center">No users found.</TableCell>
                 </TableRow>
               )}
-              {users.map((user) => (
+              {users && users.length > 0 && users.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>{user.id}</TableCell>
                   <TableCell>{user.name}</TableCell>
