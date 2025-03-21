@@ -1,9 +1,10 @@
+// ChatGPT was used to aid in the creation of this code.
+
 import React, { useState } from 'react';
-import { Box, Typography, Button, LinearProgress, Alert } from '@mui/material';
+import { Box, Typography, Button, LinearProgress, Alert, AlertTitle } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000"; // NOTE: Created fall back
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -18,7 +19,11 @@ const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
       setError(null);
     } else {
       setSelectedFile(null);
-      setError('Please select a valid PDF file');
+      setError({
+        message: 'Please select a valid PDF file',
+        step: 'validation',
+        status: 400
+      });
     }
   };
 
@@ -40,12 +45,16 @@ const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
         body: formData,
       });
       
-      if (!response.ok) {
-        throw new Error('Failed to upload PDF and generate flashcards');
-      }
-      console.log("Response:", response);
-      
       const data = await response.json();
+      
+      if (!response.ok) {
+        throw {
+          message: data.error || 'Failed to process flashcards',
+          step: data.step || 'unknown',
+          status: response.status
+        };
+      }
+      
       setProgress('Flashcards created successfully!');
       
       if (onFlashcardsGenerated) {
@@ -53,10 +62,30 @@ const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
       }
     } catch (err) {
       console.error('Error generating flashcards:', err);
-      setError(err.message || 'Failed to generate flashcards');
+      
+      // Handle both structured API errors and network/parsing errors
+      setError({
+        message: err.message || 'Failed to generate flashcards',
+        step: err.step || 'unknown',
+        status: err.status || 500
+      });
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Helper function to get user-friendly error step descriptions
+  const getErrorStepDescription = (step) => {
+    const descriptions = {
+      'validation': 'Input validation',
+      'pdf_extraction': 'PDF text extraction',
+      'ai_generation': 'AI processing',
+      'user_verification': 'User account verification',
+      'database': 'Database storage',
+      'unknown': 'Unknown step'
+    };
+    
+    return descriptions[step] || 'Processing';
   };
 
   return (
@@ -149,7 +178,8 @@ const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
             border: darkMode ? '1px solid rgba(211, 47, 47, 0.3)' : undefined
           }}
         >
-          {error}
+          <AlertTitle>Error during {getErrorStepDescription(error.step)}</AlertTitle>
+          {error.message}
         </Alert>
       )}
     </Box>
