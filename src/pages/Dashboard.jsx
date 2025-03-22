@@ -1,5 +1,7 @@
+// ChatGPT was used to aid in the creation of this code.
+
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Container, Paper, Divider, Button } from '@mui/material';
+import { Box, Typography, Container, Paper, Divider, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Card from "../components/Card/Card.jsx";
 import PDFUpload from "../components/PDFUpload/PDFUpload";
@@ -34,33 +36,89 @@ const Dashboard = () => {
   const user = auth(); 
   const userEmail = user?.email || 'test@example.com';
 
+  const [decks, setDecks] = useState([]);
+  const [selectedDeckId, setSelectedDeckId] = useState(null);
   const [flashcards, setFlashcards] = useState([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
 
-  const handleFlashcardsGenerated = (newFlashcards) => {
-    setFlashcards(newFlashcards);
-    setCurrentCardIndex(0);
+  const handleFlashcardsGenerated = (newFlashcards, deckInfo) => {
+    console.log("New flashcards generated:", newFlashcards);
+    console.log("Deck info:", deckInfo);
+    
+    // Refresh the decks list
+    fetchDecks();
+    
+    // Select the newly created deck
+    if (deckInfo && deckInfo.deckId) {
+      setSelectedDeckId(deckInfo.deckId);
+      
+      // Set the flashcards for this deck
+      setFlashcards(newFlashcards);
+      setCurrentCardIndex(0);
+    }
   };
 
   useEffect(() => {
-    if (flashcards.length === 0) {
-      fetchFlashcards();
-    }
+    fetchDecks();
   }, []);
+  
+  useEffect(() => {
+    if (selectedDeckId) {
+      fetchFlashcardsByDeckId(selectedDeckId);
+    } else if (decks.length > 0) {
+      // Auto-select the first deck if available
+      setSelectedDeckId(decks[0].id);
+    }
+  }, [selectedDeckId, decks]);
 
-  const fetchFlashcards = async () => {
+  const fetchDecks = async () => {
     try {
-      const response = await fetch(`${backendUrl}/api/flashcards/retrieve/${userEmail}`);
+      console.log("Fetching decks for:", userEmail);
+      const response = await fetch(`${backendUrl}/api/flashcards/decks/${userEmail}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch decks');
+      }
+      const data = await response.json();
+      console.log("Fetched decks:", data);
+      
+      if (data.decks && data.decks.length > 0) {
+        setDecks(data.decks);
+        if (!selectedDeckId) {
+          setSelectedDeckId(data.decks[0].id);
+        }
+      } else {
+        setDecks([]);
+      }
+    } catch (error) {
+      console.error("Error fetching decks:", error);
+      setDecks([]);
+    }
+  };
+
+  const fetchFlashcardsByDeckId = async (deckId) => {
+    try {
+      console.log("Fetching flashcards for deck:", deckId);
+      const response = await fetch(`${backendUrl}/api/flashcards/retrieve/${userEmail}?deckId=${deckId}`);
       if (!response.ok) {
         throw new Error('Failed to fetch flashcards');
       }
       const data = await response.json();
+      console.log("Fetched flashcards:", data);
+      
       if (data.flashCardData && data.flashCardData.length > 0) {
         setFlashcards(data.flashCardData);
+        setCurrentCardIndex(0);
+      } else {
+        setFlashcards([]);
       }
     } catch (error) {
       console.error("Error fetching flashcards:", error);
+      setFlashcards([]);
     }
+  };
+
+  const handleDeckChange = (event) => {
+    setSelectedDeckId(event.target.value);
   };
 
   const handleNextCard = () => {
@@ -77,6 +135,9 @@ const Dashboard = () => {
 
   // Get current flashcard data
   const currentFlashcard = flashcards.length > 0 ? flashcards[currentCardIndex] : null;
+  
+  // Find current deck name
+  const currentDeckName = decks.find(deck => deck.id === selectedDeckId)?.name || 'Select a Deck';
 
   return (
     <Container maxWidth="lg">
@@ -99,10 +160,41 @@ const Dashboard = () => {
           />
         </StyledPaper>
         
+        {decks.length > 0 && (
+          <StyledPaper elevation={3} sx={{ width: '100%' }}>
+            <Typography variant="h5" component="h2" gutterBottom sx={{ color: 'white' }}>
+              Your Flashcard Decks
+            </Typography>
+            <FormControl fullWidth sx={{ mb: 3 }}>
+              <InputLabel id="deck-select-label" sx={{ color: 'white' }}>Select Deck</InputLabel>
+              <Select
+                labelId="deck-select-label"
+                id="deck-select"
+                value={selectedDeckId || ''}
+                label="Select Deck"
+                onChange={handleDeckChange}
+                sx={{ 
+                  color: 'white',
+                  '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+                  '.MuiSvgIcon-root': { color: 'white' }
+                }}
+              >
+                {decks.map((deck) => (
+                  <MenuItem key={deck.id} value={deck.id}>
+                    {deck.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </StyledPaper>
+        )}
+        
         {currentFlashcard ? (
           <StyledPaper elevation={3} sx={{ width: '100%' }}>
             <Typography variant="h5" component="h2" gutterBottom sx={{ color: 'white' }}>
-              Flashcard {currentCardIndex + 1} of {flashcards.length}
+              {currentDeckName}: Card {currentCardIndex + 1} of {flashcards.length}
             </Typography>
             <Divider sx={{ mb: 3, backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />
             
@@ -140,7 +232,9 @@ const Dashboard = () => {
         ) : (
           <StyledPaper elevation={3} sx={{ width: '100%', textAlign: 'center', py: 4 }}>
             <Typography variant="h6" sx={{ color: 'white' }}>
-              No flashcards available. Upload a PDF to create some!
+              {decks.length > 0 
+                ? "No flashcards available in this deck. Upload a PDF to create some!" 
+                : "No flashcard decks available. Upload a PDF to create your first deck!"}
             </Typography>
           </StyledPaper>
         )}
@@ -150,6 +244,14 @@ const Dashboard = () => {
             Your Study Progress
           </Typography>
           {/* You can put study progress stats here */}
+          <Typography variant="body1" sx={{ color: 'white' }}>
+            Total Decks: {decks.length}
+          </Typography>
+          {selectedDeckId && (
+            <Typography variant="body1" sx={{ color: 'white' }}>
+              Cards in Current Deck: {flashcards.length}
+            </Typography>
+          )}
         </StyledPaper>
       </Box>
     </Container>

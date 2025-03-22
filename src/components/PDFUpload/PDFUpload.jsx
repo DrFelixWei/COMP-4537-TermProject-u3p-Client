@@ -33,6 +33,8 @@ const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
     const formData = new FormData();
     formData.append('pdfFile', selectedFile);
     formData.append('email', userEmail);
+    
+    // The filename will be used as the deck name on the server
 
     setIsLoading(true);
     setError(null);
@@ -56,9 +58,13 @@ const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
       }
       
       setProgress('Flashcards created successfully!');
+      console.log("Flashcards created:", data);
       
       if (onFlashcardsGenerated) {
-        onFlashcardsGenerated(data.flashCards);
+        onFlashcardsGenerated(data.flashCards, {
+          deckId: data.deckId,
+          deckName: data.deckName
+        });
       }
     } catch (err) {
       console.error('Error generating flashcards:', err);
