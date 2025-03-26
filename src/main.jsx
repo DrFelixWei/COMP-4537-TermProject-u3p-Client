@@ -5,7 +5,7 @@ import './index.css'
 import { AuthProvider } from "react-auth-kit";
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode>
     <AuthProvider
       authType={"cookie"}
       authName={"_auth"} 
@@ -14,5 +14,5 @@ createRoot(document.getElementById('root')).render(
     >
       <App />
     </AuthProvider>
-  </StrictMode>,
+  // </StrictMode>,
 )
