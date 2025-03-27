@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, LinearProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-const MAX_USAGE = 25;
+const MAX_USAGE = 20;
 
 const UsageContainer = styled(Box)({
   position: 'relative',

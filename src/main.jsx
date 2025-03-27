@@ -1,8 +1,9 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.jsx'
-import './index.css'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App.jsx';
+import './index.css';
 import { AuthProvider } from "react-auth-kit";
+import './i18n'; // Import i18n configuration
 
 createRoot(document.getElementById('root')).render(
   // <StrictMode>
@@ -15,4 +16,4 @@ createRoot(document.getElementById('root')).render(
       <App />
     </AuthProvider>
   // </StrictMode>,
-)
+);
