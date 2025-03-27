@@ -17,7 +17,10 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const Admin = () => {
   const [users, setUsers] = useState([]);
-  const [apiStats, setApiStats] = useState([]);
+  const [apiStats, setApiStats] = useState({
+    userStats: [],
+    aggregateStats: []
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -34,7 +37,6 @@ const Admin = () => {
         },
         credentials: "include", // In case you also want to send cookies
       });
-
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || "Failed to fetch users");
@@ -65,17 +67,25 @@ const Admin = () => {
       if (!res.ok) {
         throw new Error("Failed to fetch API stats");
       }
-      setApiStats(data);
+      
+      // Ensure we have the expected structure
+      setApiStats({
+        userStats: Array.isArray(data.userStats) ? data.userStats : [],
+        aggregateStats: Array.isArray(data.aggregateStats) ? data.aggregateStats : []
+      });
     } catch (err) {
       setError(err.message);
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUsers();
-    fetchApiStatistics();
+    const fetchData = async () => {
+      setLoading(true);
+      await Promise.all([fetchUsers(), fetchApiStatistics()]);
+      setLoading(false);
+    };
+    
+    fetchData();
   }, []); // Only run this effect once on mount
 
   return (
@@ -96,7 +106,10 @@ const Admin = () => {
       {!loading && !error && (
         <Paper sx={{width: "100%", overflowX: "auto", mt: 2, p: 2, backgroundColor: 'transparent', boxShadow: 'none' }}>
           {/* Users Table */}
-          <Paper sx={{mb: 3, p: 2}} elevation={3}>
+          <Paper sx={{mb: 3, p: 2, fontWeight: "bold", color: "black"}} elevation={3}>
+            <Typography variant="h6"gutterBottom>
+              Users
+            </Typography>
             <Table>
               <TableHead>
                 <TableRow>
@@ -116,27 +129,31 @@ const Admin = () => {
               </TableHead>
 
               <TableBody>
-                {!users || users.length === 0 && (
+                {users.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} align="center">
                       No users found.
                     </TableCell>
                   </TableRow>
+                ) : (
+                  users.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell sx={{color: "black"}}>{user.id}</TableCell>
+                      <TableCell sx={{color: "black"}}>{user.name}</TableCell>
+                      <TableCell sx={{color: "black"}}>{user.email}</TableCell>
+                      <TableCell sx={{color: "black"}}>{user.role}</TableCell>
+                    </TableRow>
+                  ))
                 )}
-                {users || users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell sx={{color: "black"}}>{user.id}</TableCell>
-                    <TableCell sx={{color: "black"}}>{user.name}</TableCell>
-                    <TableCell sx={{color: "black"}}>{user.email}</TableCell>
-                    <TableCell sx={{color: "black"}}>{user.role}</TableCell>
-                  </TableRow>
-                ))}
               </TableBody>
             </Table>
           </Paper>
 
           {/* User Stats Table */}
-          <Paper sx={{mb: 3, p: 2}} elevation={3}>
+          <Paper sx={{mb: 3, p: 2, fontWeight: "bold", color: "black"}} elevation={3}>
+            <Typography variant="h6" gutterBottom>
+              User Statistics
+            </Typography>
             <Table>
               <TableHead>
                 <TableRow>
@@ -153,32 +170,36 @@ const Admin = () => {
               </TableHead>
 
               <TableBody>
-                {!apiStats || apiStats.userStats.length === 0 && (
+                {apiStats.userStats.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={3} align="center">
                       No user stats found.
                     </TableCell>
                   </TableRow>
+                ) : (
+                  apiStats.userStats.map((userStats) => (
+                    <TableRow key={userStats.email}>
+                      <TableCell sx={{color: "black"}}>
+                        {userStats.name}
+                      </TableCell>
+                      <TableCell sx={{color: "black"}}>
+                        {userStats.email}
+                      </TableCell>
+                      <TableCell sx={{color: "black"}}>
+                        {userStats.total_requests}
+                      </TableCell>
+                    </TableRow>
+                  ))
                 )}
-                {apiStats.userStats.map((userStats) => (
-                  <TableRow key={userStats.email}>
-                    <TableCell sx={{color: "black"}}>
-                      {userStats.name}
-                    </TableCell>
-                    <TableCell sx={{color: "black"}}>
-                      {userStats.email}
-                    </TableCell>
-                    <TableCell sx={{color: "black"}}>
-                      {userStats.total_requests}
-                    </TableCell>
-                  </TableRow>
-                ))}
               </TableBody>
             </Table>
           </Paper>
 
           {/* API Stats Table */}
-          <Paper sx={{p: 2}} elevation={3}>
+          <Paper sx={{mb: 3, p: 2, fontWeight: "bold", color: "black"}} elevation={3}>
+            <Typography variant="h6" gutterBottom>
+              API Usage Statistics
+            </Typography>
             <Table>
               <TableHead>
                 <TableRow>
@@ -195,26 +216,27 @@ const Admin = () => {
               </TableHead>
 
               <TableBody>
-                {!apiStats || apiStats.aggregateStats.length === 0 && (
+                {apiStats.aggregateStats.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={3} align="center">
                       No usage stats found.
                     </TableCell>
                   </TableRow>
+                ) : (
+                  apiStats.aggregateStats.map((aggregateStats) => (
+                    <TableRow key={`${aggregateStats.api_endpoint}-${aggregateStats.method}`}>
+                      <TableCell sx={{color: "black"}}>
+                        {aggregateStats.api_endpoint}
+                      </TableCell>
+                      <TableCell sx={{color: "black"}}>
+                        {aggregateStats.method}
+                      </TableCell>
+                      <TableCell sx={{color: "black"}}>
+                        {aggregateStats.requests}
+                      </TableCell>
+                    </TableRow>
+                  ))
                 )}
-                {apiStats.aggregateStats.map((aggregateStats) => (
-                  <TableRow key={aggregateStats.api_endpoint}>
-                    <TableCell sx={{color: "black"}}>
-                      {aggregateStats.api_endpoint}
-                    </TableCell>
-                    <TableCell sx={{color: "black"}}>
-                      {aggregateStats.method}
-                    </TableCell>
-                    <TableCell sx={{color: "black"}}>
-                      {aggregateStats.requests}
-                    </TableCell>
-                  </TableRow>
-                ))}
               </TableBody>
             </Table>
           </Paper>
