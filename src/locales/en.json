@@ -1,6 +1,7 @@
 {
     "welcome": "Welcome",
     "greeting": "Hello, {{name}}!",
-    "home": "Home"
+    "home": "Home",
+    "API Usage": "API Usage"
 }
   

@@ -55,6 +55,27 @@ const Dashboard = () => {
   const [selectedDeckId, setSelectedDeckId] = useState(null);
   const [flashcards, setFlashcards] = useState([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [apiUsage, setAPIUsage] = useState(0);
+  const MAX_USAGE = 20;
+
+  const fetchAPIUsage = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/api/users/getApiUsage/${userId}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch user's API usage");
+      }
+      const data = await response.json();
+      if (data.apiUsage) {
+        setAPIUsage(data.apiUsage);
+      }
+    } catch (error) {
+      console.error("Error fetching user's API usage:", error);
+    }
+  };
+  useEffect(() => {
+    fetchAPIUsage();
+  }, []);
+
 
   const handleFlashcardsGenerated = (newFlashcards, deckInfo) => {
     console.log("New flashcards generated:", newFlashcards);
@@ -197,8 +218,30 @@ const Dashboard = () => {
           Dashboard
         </Typography>
 
-        <APIUsage userId={userId}/>
+        <APIUsage apiUsage={apiUsage} MAX_USAGE={MAX_USAGE}/>
 
+        { apiUsage >= MAX_USAGE &&
+        <StyledPaper elevation={3} sx={{width: "100%"}}>
+          <Typography
+            variant="h5"
+            component="h2"  
+            gutterBottom
+            sx={{color: "white"}}
+          >
+            Upgrade Your Plan
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{color: "rgba(255, 255, 255, 0.7)"}}
+            paragraph
+          >
+            You have reached the maximum API usage limit. Please upgrade your plan to continue using the service.
+          </Typography>
+        </StyledPaper>
+        }
+
+
+        { apiUsage < MAX_USAGE &&  
         <StyledPaper elevation={3} sx={{width: "100%"}}>
           <Typography
             variant="h5"
@@ -221,6 +264,7 @@ const Dashboard = () => {
             darkMode={true}
           />
         </StyledPaper>
+        }
 
         {decks.length > 0 && (
           <StyledPaper elevation={3} sx={{width: "100%"}}>

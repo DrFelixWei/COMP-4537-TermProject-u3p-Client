@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, LinearProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { useTranslation } from 'react-i18next';
 
 const MAX_USAGE = 20;
 
@@ -22,7 +23,7 @@ const UsageBar = styled(LinearProgress)(({ theme }) => ({
   borderRadius: 5,
   backgroundColor: theme.palette.grey[300],
   '& .MuiLinearProgress-bar': {
-    backgroundColor: theme.palette.primary.main,
+    borderRadius: 5,
   },
 }));
 
@@ -36,37 +37,25 @@ const UsageText = styled(Typography)({
   color: 'white',
 });
 
-const APIUsage = ({ userId }) => {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
-  const [apiUsage, setAPIUsage] = useState(0);
-
-  const fetchAPIUsage = async () => {
-    try {
-      const response = await fetch(`${backendUrl}/api/users/getApiUsage/${userId}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch user's API usage");
-      }
-      const data = await response.json();
-      if (data.apiUsage) {
-        setAPIUsage(data.apiUsage);
-      }
-    } catch (error) {
-      console.error("Error fetching user's API usage:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchAPIUsage();
-  }, []);
-
+const APIUsage = ({ 
+  apiUsage = 0,
+  MAX_USAGE = 20,
+ }) => {
+  
+  const { t } = useTranslation();
   const usagePercentage = (apiUsage / MAX_USAGE) * 100;
+  const usageColor = usagePercentage >= 100 ? 'error' : usagePercentage >= 75 ? 'warning' : 'primary';
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" width="100%" p={2}>
       <UsageContainer>
-        <Typography variant="h6">API Usage</Typography>
+        <Typography variant="h6">{t('API Usage')}</Typography>
         <UsageBarWrapper>
-          <UsageBar variant="determinate" value={Math.min(usagePercentage, 100)} />
+          <UsageBar 
+            variant="determinate" 
+            value={Math.min(usagePercentage, 100)} 
+            color={usageColor} // Set color dynamically here
+          />
           <UsageText variant="body1">
             {apiUsage} / {MAX_USAGE}
           </UsageText>
