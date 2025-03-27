@@ -116,14 +116,14 @@ const Admin = () => {
               </TableHead>
 
               <TableBody>
-                {users.length === 0 && (
+                {!users || users.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={4} align="center">
                       No users found.
                     </TableCell>
                   </TableRow>
                 )}
-                {users.map((user) => (
+                {users || users.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell sx={{color: "black"}}>{user.id}</TableCell>
                     <TableCell sx={{color: "black"}}>{user.name}</TableCell>
@@ -153,7 +153,7 @@ const Admin = () => {
               </TableHead>
 
               <TableBody>
-                {apiStats.userStats.length === 0 && (
+                {!apiStats || apiStats.userStats.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={3} align="center">
                       No user stats found.
@@ -195,7 +195,7 @@ const Admin = () => {
               </TableHead>
 
               <TableBody>
-                {apiStats.aggregateStats.length === 0 && (
+                {!apiStats || apiStats.aggregateStats.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={3} align="center">
                       No usage stats found.
