@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -10,8 +10,21 @@ import {
   CircularProgress,
   Alert,
   Paper,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  IconButton,
 } from "@mui/material";
-import {useAuthHeader} from "react-auth-kit";
+import { useAuthHeader } from "react-auth-kit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
@@ -23,70 +36,210 @@ const Admin = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [userFormData, setUserFormData] = useState({
+    name: "",
+    email: "",
+    role: "user"
+  });
+  const [statusMessage, setStatusMessage] = useState({ message: "", type: "" });
 
   // Fetch token from react-auth-kit
-  const authHeader = useAuthHeader(); // This hook provides the Authorization header
+  const authHeader = useAuthHeader(); 
+  
+  // Common headers for all requests
+  const getHeaders = () => ({
+    Authorization: authHeader(),
+    "X-User-Role": "admin",
+    "Content-Type": "application/json"
+  });
 
+  // Fetch all users
   const fetchUsers = async () => {
     try {
       const res = await fetch(`${backendUrl}/api/admin/getUsers`, {
         method: "GET",
-        headers: {
-          Authorization: authHeader(), // Automatically adds 'Bearer {token}' to the header
-          "X-User-Role": "admin",
-        },
-        credentials: "include", // In case you also want to send cookies
+        headers: getHeaders(),
+        credentials: "include",
       });
+
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || "Failed to fetch users");
       }
 
-      // Ensure that data is always an array
-      setUsers(Array.isArray(data) ? data : [data]);
+      setUsers(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError(err.message);
+      setError(`Error fetching users: ${err.message}`);
+      console.error("Error fetching users:", err);
+    }
+  };
+
+  // Fetch a specific user by ID
+  const fetchUserById = async (userId) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${backendUrl}/api/admin/getUser/${userId}`, {
+        method: "GET",
+        headers: getHeaders(),
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to fetch user");
+      }
+
+      setSelectedUser(data);
+      setUserFormData({
+        name: data.name || "",
+        email: data.email || "",
+        role: data.role || "user"
+      });
+      
+      setOpenEditDialog(true);
+    } catch (err) {
+      setError(`Error fetching user: ${err.message}`);
+      console.error("Error fetching user:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchApiStatistics = async () => {
+  // Update user
+  const updateUser = async () => {
     try {
-      const res = await fetch(`${backendUrl}/api/admin/getApiStats`, {
-        method: "GET",
-        headers: {
-          Authorization: authHeader(),
-          "X-User-Role": "admin",
-        },
+      setLoading(true);
+      const res = await fetch(`${backendUrl}/api/admin/updateUser/${selectedUser.id}`, {
+        method: "PUT",
+        headers: getHeaders(),
+        credentials: "include",
+        body: JSON.stringify(userFormData)
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to update user");
+      }
+
+      // Update the users list
+      setUsers(users.map(user => user.id === selectedUser.id ? { ...user, ...userFormData } : user));
+      setOpenEditDialog(false);
+      setStatusMessage({ message: "User updated successfully", type: "success" });
+      
+      // Refresh user list
+      fetchUsers();
+    } catch (err) {
+      setError(`Error updating user: ${err.message}`);
+      console.error("Error updating user:", err);
+      setStatusMessage({ message: `Error updating user: ${err.message}`, type: "error" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete user
+  const deleteUser = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${backendUrl}/api/admin/deleteUser/${selectedUser.id}`, {
+        method: "DELETE",
+        headers: getHeaders(),
         credentials: "include",
       });
 
       const data = await res.json();
-
       if (!res.ok) {
-        throw new Error("Failed to fetch API stats");
+        throw new Error(data.error || "Failed to delete user");
+      }
+
+      // Remove user from the list
+      setUsers(users.filter(user => user.id !== selectedUser.id));
+      setOpenDeleteDialog(false);
+      setStatusMessage({ message: "User deleted successfully", type: "success" });
+    } catch (err) {
+      setError(`Error deleting user: ${err.message}`);
+      console.error("Error deleting user:", err);
+      setStatusMessage({ message: `Error deleting user: ${err.message}`, type: "error" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch API statistics
+  const fetchApiStatistics = async () => {
+    try {
+      const res = await fetch(`${backendUrl}/api/admin/getApiStats`, {
+        method: "GET",
+        headers: getHeaders(),
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to fetch API stats");
       }
       
-      // Ensure we have the expected structure
       setApiStats({
         userStats: Array.isArray(data.userStats) ? data.userStats : [],
         aggregateStats: Array.isArray(data.aggregateStats) ? data.aggregateStats : []
       });
     } catch (err) {
-      setError(err.message);
+      setError(`Error fetching API stats: ${err.message}`);
+      console.error("Error fetching API stats:", err);
     }
   };
 
+  // Handle form field changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUserFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Handle opening edit dialog
+  const handleEditUser = (user) => {
+    fetchUserById(user.id);
+  };
+
+  // Handle opening delete dialog
+  const handleDeleteUser = (user) => {
+    setSelectedUser(user);
+    setOpenDeleteDialog(true);
+  };
+
+  // Fetch all data on mount
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      await Promise.all([fetchUsers(), fetchApiStatistics()]);
-      setLoading(false);
+      setError("");
+      try {
+        await Promise.all([fetchUsers(), fetchApiStatistics()]);
+      } catch (err) {
+        setError(`Error initializing admin panel: ${err.message}`);
+        console.error("Error initializing admin panel:", err);
+      } finally {
+        setLoading(false);
+      }
     };
     
     fetchData();
-  }, []); // Only run this effect once on mount
+  }, []);
+
+  // Auto-dismiss success messages after 5 seconds
+  useEffect(() => {
+    if (statusMessage.message && statusMessage.type === "success") {
+      const timer = setTimeout(() => {
+        setStatusMessage({ message: "", type: "" });
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [statusMessage]);
 
   return (
     <Box
@@ -102,13 +255,18 @@ const Admin = () => {
 
       {loading && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}
+      {statusMessage.message && (
+        <Alert severity={statusMessage.type} sx={{ width: "100%", mb: 2 }}>
+          {statusMessage.message}
+        </Alert>
+      )}
 
       {!loading && !error && (
         <Paper sx={{width: "100%", overflowX: "auto", mt: 2, p: 2, backgroundColor: 'transparent', boxShadow: 'none' }}>
           {/* Users Table */}
           <Paper sx={{mb: 3, p: 2, fontWeight: "bold", color: "black"}} elevation={3}>
-            <Typography variant="h6"gutterBottom>
-              Users
+            <Typography variant="h6" gutterBottom>
+              Users Management
             </Typography>
             <Table>
               <TableHead>
@@ -125,13 +283,16 @@ const Admin = () => {
                   <TableCell sx={{fontWeight: "bold", color: "black"}}>
                     Role
                   </TableCell>
+                  <TableCell sx={{fontWeight: "bold", color: "black"}}>
+                    Actions
+                  </TableCell>
                 </TableRow>
               </TableHead>
 
               <TableBody>
                 {users.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} align="center">
+                    <TableCell colSpan={5} align="center">
                       No users found.
                     </TableCell>
                   </TableRow>
@@ -142,6 +303,22 @@ const Admin = () => {
                       <TableCell sx={{color: "black"}}>{user.name}</TableCell>
                       <TableCell sx={{color: "black"}}>{user.email}</TableCell>
                       <TableCell sx={{color: "black"}}>{user.role}</TableCell>
+                      <TableCell>
+                        <IconButton 
+                          color="primary" 
+                          onClick={() => handleEditUser(user)}
+                          aria-label="edit user"
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton 
+                          color="error" 
+                          onClick={() => handleDeleteUser(user)}
+                          aria-label="delete user"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
                     </TableRow>
                   ))
                 )}
@@ -242,6 +419,67 @@ const Admin = () => {
           </Paper>
         </Paper>
       )}
+
+      {/* Edit User Dialog */}
+      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+        <DialogTitle>Edit User</DialogTitle>
+        <DialogContent>
+          <Box component="form" sx={{ mt: 2 }}>
+            <TextField
+              margin="dense"
+              label="Name"
+              name="name"
+              fullWidth
+              value={userFormData.name}
+              onChange={handleInputChange}
+              variant="outlined"
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              margin="dense"
+              label="Email"
+              name="email"
+              type="email"
+              fullWidth
+              value={userFormData.email}
+              onChange={handleInputChange}
+              variant="outlined"
+              sx={{ mb: 2 }}
+            />
+            <FormControl fullWidth>
+              <InputLabel id="role-select-label">Role</InputLabel>
+              <Select
+                labelId="role-select-label"
+                name="role"
+                value={userFormData.role}
+                label="Role"
+                onChange={handleInputChange}
+              >
+                <MenuItem value="user">User</MenuItem>
+                <MenuItem value="admin">Admin</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
+          <Button onClick={updateUser} color="primary">Save</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete User Dialog */}
+      <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete user "{selectedUser?.name}"? This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
+          <Button onClick={deleteUser} color="error">Delete</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
