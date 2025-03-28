@@ -288,7 +288,48 @@ const Dashboard = () => {
                   <InputLabel id="deck-select-label" sx={{color: "white"}}>
                     {t('dashboard.selectDeck')}
                   </InputLabel>
-                  {/* ... rest of the Select component remains the same ... */}
+
+                  <Select
+                    labelId="deck-select-label"
+                    id="deck-select"
+                    value={selectedDeckId || ""}
+                    label="Select Deck"
+                    onChange={handleDeckChange}
+                    sx={{
+                      color: "white",
+                      ".MuiOutlinedInput-notchedOutline": {
+                        borderColor: "rgba(255, 255, 255, 0.3)",
+                      },
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "rgba(255, 255, 255, 0.5)",
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "white",
+                      },
+                      ".MuiSvgIcon-root": {color: "white"},
+                    }}
+                  >
+                    {decks.map((deck) => (
+                      <MenuItem
+                        key={deck.id}
+                        value={deck.id}
+                        sx={{color: "black"}}
+                      >
+                        {deck.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <IconButton
+                    color="error"
+                    onClick={handleDeleteDeck}
+                    sx={{
+                      color: "white",
+                      "&:hover": {backgroundColor: "rgba(255, 0, 0, 0.1)"},
+                    }}
+                    aria-label="delete"
+                  >
+                    <DeleteIcon />
+                  </IconButton>
                 </Box>
               </FormControl>
             </StyledPaper>
@@ -308,7 +349,25 @@ const Dashboard = () => {
                   totalCards: flashcards.length 
                 })}
               </Typography>
-              {/* ... rest of the component remains the same ... */}
+              
+              <Divider
+                sx={{mb: 3, backgroundColor: "rgba(255, 255, 255, 0.1)"}}
+              />
+
+              <Box display="flex" justifyContent="center" mb={3}>
+                <Card
+                  faceBackgroundColor="#2c3e50" // Dark blue for question side
+                  backBackgroundColor="#1e824c" // Darker green for answer side
+                  length={336}
+                  width={240}
+                  value={{
+                    front: currentFlashcard.question || currentFlashcard.term,
+                    back: currentFlashcard.answer || currentFlashcard.definition,
+                  }}
+                  flipTimer={10000} // Auto-flip after 10 seconds
+                />
+              </Box>
+
               <Box display="flex" justifyContent="space-between" mt={2}>
                 <StyledButton
                   variant="contained"
