@@ -50,7 +50,7 @@ const Dashboard = () => {
   const { t } = useTranslation();
   const auth = useAuthUser();
   const user = auth();
-  const userEmail = user?.email || "test@example.com";
+  const userEmail = user?.email;
   const userId = user?.id || 1;
 
   const [decks, setDecks] = useState([]);

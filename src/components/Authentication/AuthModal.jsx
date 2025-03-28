@@ -39,7 +39,10 @@ const AuthModal = ({ isOpen, setIsOpen }) => {
 
     try {
       const endpoint = showSignup ? "/api/users/register" : "/api/users/login";
-      const body = showSignup ? { name: formData.name, email: formData.email, password: formData.password } : { email: formData.email, password: formData.password };
+      const body = showSignup ? 
+        { name: formData.name, email: formData.email, password: formData.password } 
+        : 
+        { email: formData.email, password: formData.password };
       
       const response = await fetch(`${backendUrl}${endpoint}`, {
         method: "POST",
@@ -67,25 +70,54 @@ const AuthModal = ({ isOpen, setIsOpen }) => {
 
   return (
     <Dialog open={isOpen} onClose={() => setIsOpen(false)} maxWidth="sm"
-      PaperProps={{ sx: { backgroundColor: theme.palette.background.secondary, color: theme.palette.text.primary } }}>
+      PaperProps={{ 
+        sx: { backgroundColor: theme.palette.background.secondary, color: theme.palette.text.primary } 
+        }}>
+      
       <IconButton onClick={() => setIsOpen(false)} sx={{ position: "absolute", top: 8, right: 8 }}>
         <CloseIcon />
       </IconButton>
+
       <DialogContent>
+
         <Box display="flex" flexDirection="column" alignItems="center" width="100%">
-          <Typography variant="h5" gutterBottom>{showSignup ? t('authModal.signUp') : t('authModal.login')}</Typography>
-          {error && <Alert severity="error">{error}</Alert>}
-          <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          
+          <Typography variant="h5" gutterBottom>
+            {showSignup ? t('authModal.signUp') : t('authModal.login')}
+          </Typography>
+
+          {error && 
+            <Alert severity="error">
+              {error}
+            </Alert>
+          }
+
+          <Box 
+            component="form" 
+            onSubmit={handleSubmit} 
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          >
             {showSignup && <TextField label={t('authModal.fullName')} name="name" value={formData.name} onChange={handleChange} required />}
+            
             <TextField label={t('authModal.email')} type="email" name="email" value={formData.email} onChange={handleChange} required />
+            
             {showSignup && <TextField label={t('authModal.confirmEmail')} type="email" name="confirmEmail" value={formData.confirmEmail} onChange={handleChange} required />}
+            
             <TextField label={t('authModal.password')} type="password" name="password" value={formData.password} onChange={handleChange} required />
-            <Button type="submit" variant="contained" color="primary" fullWidth>{showSignup ? t('authModal.signUp') : t('authModal.login')}</Button>
+            
+            <Button type="submit" variant="contained" color="primary" fullWidth>
+              {showSignup ? t('authModal.signUp') : t('authModal.login')}
+            </Button>
+
           </Box>
-          <Typography sx={{ mt: 2, cursor: 'pointer', color: 'primary.main', textDecoration: 'underline' }}
-            onClick={() => setShowSignup(!showSignup)}>
+
+          <Typography 
+            sx={{ mt: 2, cursor: 'pointer', color: 'primary.main', textDecoration: 'underline' }}
+            onClick={() => setShowSignup(!showSignup)}
+          >
             {showSignup ? t('authModal.returningUser') : t('authModal.newUser')}
           </Typography>
+
         </Box>
       </DialogContent>
     </Dialog>
