@@ -25,10 +25,12 @@ import {
 import { useAuthHeader } from "react-auth-kit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import { useTranslation } from 'react-i18next';
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const Admin = () => {
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [apiStats, setApiStats] = useState({
     userStats: [],
@@ -157,14 +159,14 @@ const Admin = () => {
       // Update the users list
       setUsers(users.map(user => user.id === selectedUser.id ? { ...user, ...userFormData } : user));
       setOpenEditDialog(false);
-      setStatusMessage({ message: "User updated successfully", type: "success" });
+      setStatusMessage({ message: t('adminStatusMessage.userUpdateSuccess'), type: "success" });
       
       // Refresh user list and API statistics
       await fetchUsers();
     } catch (err) {
       setError(`Error updating user: ${err.message}`);
       console.error("Error updating user:", err);
-      setStatusMessage({ message: `Error updating user: ${err.message}`, type: "error" });
+      setStatusMessage({ message: t('adminStatusMessage.userUpdateError', { errorMessage: err.message }), type: "error" });
     } finally {
       setLoading(false);
     }
@@ -188,14 +190,14 @@ const Admin = () => {
       // Remove user from the list
       setUsers(users.filter(user => user.id !== selectedUser.id));
       setOpenDeleteDialog(false);
-      setStatusMessage({ message: "User deleted successfully", type: "success" });
+      setStatusMessage({ message: t('adminStatusMessage.userDeleteSuccess'), type: "success" });
       
       // Refresh API statistics after deleting user
       await fetchApiStatistics();
     } catch (err) {
       setError(`Error deleting user: ${err.message}`);
       console.error("Error deleting user:", err);
-      setStatusMessage({ message: `Error deleting user: ${err.message}`, type: "error" });
+      setStatusMessage({ message: t('adminStatusMessage.userDeleteError', { errorMessage: err.message }), type: "error" });
     } finally {
       setLoading(false);
     }
@@ -259,7 +261,7 @@ const Admin = () => {
       p={4}
     >
       <Typography variant="h4" gutterBottom>
-        Admin Panel
+        {t('Admin Panel')}
       </Typography>
 
       {loading && <CircularProgress />}
@@ -277,25 +279,25 @@ const Admin = () => {
           {/* Users Table */}
           <Paper sx={{mb: 3, p: 2, color: "black"}} elevation={3}>
             <Typography variant="h6" gutterBottom>
-              Users Management
+              {t('Users Management')} 
             </Typography>
             <Table>
               <TableHead>
                 <TableRow>
                   <TableCell sx={{fontWeight: "bold", color: "black"}}>
-                    ID
+                    {t('ID')} 
                   </TableCell>
                   <TableCell sx={{fontWeight: "bold", color: "black"}}>
-                    Name
+                    {t('Name')} 
                   </TableCell>
                   <TableCell sx={{fontWeight: "bold", color: "black"}}>
-                    Email
+                    {t('Email')} 
                   </TableCell>
                   <TableCell sx={{fontWeight: "bold", color: "black"}}>
-                    Role
+                    {t('Role')} 
                   </TableCell>
                   <TableCell sx={{fontWeight: "bold", color: "black"}}>
-                    Actions
+                    {t('Actions')} 
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -304,7 +306,7 @@ const Admin = () => {
                 {users.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} align="center">
-                      No users found.
+                      {t('No users found.')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -340,19 +342,19 @@ const Admin = () => {
           {/* User Stats Table */}
           <Paper sx={{mb: 3, p: 2, color: "black"}} elevation={3}>
             <Typography variant="h6" gutterBottom>
-              User Statistics
+              {t('User Statistics')}
             </Typography>
             <Table>
               <TableHead>
                 <TableRow>
                   <TableCell sx={{fontWeight: "bold", color: "black"}}>
-                    Name
+                    {t('Name')}
                   </TableCell>
                   <TableCell sx={{fontWeight: "bold", color: "black"}}>
-                    Email
+                    {t('Email')}
                   </TableCell>
                   <TableCell sx={{fontWeight: "bold", color: "black"}}>
-                    Total Requests
+                    {t('Total Requests')}
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -361,7 +363,7 @@ const Admin = () => {
                 {apiStats.userStats.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={3} align="center">
-                      No user stats found.
+                      {t('No user stats found.')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -386,19 +388,19 @@ const Admin = () => {
           {/* API Stats Table */}
           <Paper sx={{p: 2, color: "black"}} elevation={3}>
             <Typography variant="h6" gutterBottom>
-              API Usage Statistics
+              {t('API Usage Statistics')}
             </Typography>
             <Table>
               <TableHead>
                 <TableRow>
                   <TableCell sx={{fontWeight: "bold", color: "black"}}>
-                    API Endpoint
+                    {t('API Endpoint')}
                   </TableCell>
                   <TableCell sx={{fontWeight: "bold", color: "black"}}>
-                    Method
+                    {t('Method')}
                   </TableCell>
                   <TableCell sx={{fontWeight: "bold", color: "black"}}>
-                    Requests
+                    {t('Requests')}
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -407,7 +409,7 @@ const Admin = () => {
                 {apiStats.aggregateStats.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={3} align="center">
-                      No usage stats found.
+                      {t('No usage stats found.')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -433,7 +435,7 @@ const Admin = () => {
 
       {/* Edit User Dialog */}
       <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
-        <DialogTitle sx={{color: "black"}}>Edit User</DialogTitle>
+        <DialogTitle sx={{color: "black"}}>{t('Edit User')}</DialogTitle>
         <DialogContent>
           <Box component="form" sx={{ mt: 2 }}>
             <TextField
@@ -458,7 +460,7 @@ const Admin = () => {
               sx={{ mb: 2, input: { color: "black" } }}
             />
             <FormControl fullWidth>
-              <InputLabel id="role-select-label">Role</InputLabel>
+              <InputLabel id="role-select-label">{t('Role')}</InputLabel>
               <Select
                 labelId="role-select-label"
                 name="role"
@@ -467,29 +469,29 @@ const Admin = () => {
                 onChange={handleInputChange}
                 sx={{ color: "black" }}
               >
-                <MenuItem value="user" sx={{ color: "black" }}>User</MenuItem>
-                <MenuItem value="admin" sx={{ color: "black" }}>Admin</MenuItem>
+                <MenuItem value="user" sx={{ color: "black" }}>{t('User')}</MenuItem>
+                <MenuItem value="admin" sx={{ color: "black" }}>{t('Admin')}</MenuItem>
               </Select>
             </FormControl>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
-          <Button onClick={updateUser} color="primary">Save</Button>
+          <Button onClick={() => setOpenEditDialog(false)}>{t('Cacnel')}</Button>
+          <Button onClick={updateUser} color="primary">{t('Save')}</Button>
         </DialogActions>
       </Dialog>
 
       {/* Delete User Dialog */}
       <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-        <DialogTitle sx={{color: "red"}}>Confirm Delete</DialogTitle>
+        <DialogTitle sx={{color: "red"}}>{t('Confirm Delete')}</DialogTitle>
         <DialogContent>
           <Typography sx={{color: "black"}}>
-            Are you sure you want to delete user "{selectedUser?.name}"? This action cannot be undone.
+            {t('deleteUserConfirmation', { userName: selectedUser?.name })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
-          <Button onClick={deleteUser} color="error">Delete</Button>
+          <Button onClick={() => setOpenDeleteDialog(false)}>{t('Cancel')}</Button>
+          <Button onClick={deleteUser} color="error">{t('Delete')}</Button>
         </DialogActions>
       </Dialog>
     </Box>

@@ -4,8 +4,10 @@ import Logout from "../Authentication/Logout";
 import { AppBar, Toolbar, Button, Box, Typography } from "@mui/material";
 import { useState } from "react";
 import AuthModal from "../Authentication/AuthModal";
+import { useTranslation } from 'react-i18next';
 
 const Navbar = () => {
+  const { t } = useTranslation();
   const auth = useAuthUser(); // Get user data
   const [loginOpen, setLoginOpen] = useState(false); 
 
@@ -14,16 +16,16 @@ const Navbar = () => {
       <AppBar position="static" color="primary">
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            MemoMaker
+            {t('navbar.appName')}
           </Typography>
 
           {auth() ? (
           <Button color="inherit" component={Link} to="/dashboard">
-            Dashboard
+            {t('navbar.dashboard')}
           </Button>
           ) : (
             <Button color="inherit" component={Link} to="/">
-              Home
+              {t('navbar.home')}
             </Button>
           )}
 
@@ -31,14 +33,14 @@ const Navbar = () => {
             <Box sx={{ display: "flex", gap: 2 }}>
               {auth().role === "admin" && (
                 <Button color="inherit" component={Link} to="/admin">
-                  Admin Panel
+                  {t('navbar.admin')}
                 </Button>
               )}
               <Logout />
             </Box>
           ) : (
             <Button color="inherit" onClick={() => setLoginOpen(true)}>
-              Login
+              {t('navbar.login')}
             </Button>
           )}
         </Toolbar>

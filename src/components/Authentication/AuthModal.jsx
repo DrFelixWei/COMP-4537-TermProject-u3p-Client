@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useSignIn } from 'react-auth-kit';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, Dialog, DialogContent, IconButton, TextField, Button, Container, Paper, Alert } from '@mui/material';
+import { Box, Typography, Dialog, DialogContent, IconButton, TextField, Button, Alert } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import CloseIcon from "@mui/icons-material/Close";
+import { useTranslation } from 'react-i18next';
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const AuthModal = ({ isOpen, setIsOpen }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const signIn = useSignIn();
   const navigate = useNavigate();
@@ -26,11 +28,11 @@ const AuthModal = ({ isOpen, setIsOpen }) => {
     if (showSignup) {
       const { name, email, confirmEmail, password } = formData;
       if (!name || !email || !confirmEmail || !password) {
-        setError("All fields are required.");
+        setError(t('authModal.allFieldsRequired'));
         return;
       }
       if (email !== confirmEmail) {
-        setError("Emails do not match.");
+        setError(t('authModal.emailsDoNotMatch'));
         return;
       }
     }
@@ -47,13 +49,12 @@ const AuthModal = ({ isOpen, setIsOpen }) => {
       });
       
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Authentication failed"); 
+      if (!response.ok) throw new Error(data.error || t('authModal.authenticationFailed')); 
 
       signIn({
         token: data.token,
         expiresIn: 3600,
         tokenType: "Bearer",
-        // authState: null, // No user info is available
         authState: { id: data.user.id, name: data.user.name, email: data.user.email, role: data.user.role },
       });
 
@@ -72,18 +73,18 @@ const AuthModal = ({ isOpen, setIsOpen }) => {
       </IconButton>
       <DialogContent>
         <Box display="flex" flexDirection="column" alignItems="center" width="100%">
-          <Typography variant="h5" gutterBottom>{showSignup ? "Sign Up" : "Login"}</Typography>
+          <Typography variant="h5" gutterBottom>{showSignup ? t('authModal.signUp') : t('authModal.login')}</Typography>
           {error && <Alert severity="error">{error}</Alert>}
           <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {showSignup && <TextField label="Full Name" name="name" value={formData.name} onChange={handleChange} required />}
-            <TextField label="Email" type="email" name="email" value={formData.email} onChange={handleChange} required />
-            {showSignup && <TextField label="Confirm Email" type="email" name="confirmEmail" value={formData.confirmEmail} onChange={handleChange} required />}
-            <TextField label="Password" type="password" name="password" value={formData.password} onChange={handleChange} required />
-            <Button type="submit" variant="contained" color="primary" fullWidth>{showSignup ? "Sign Up" : "Login"}</Button>
+            {showSignup && <TextField label={t('authModal.fullName')} name="name" value={formData.name} onChange={handleChange} required />}
+            <TextField label={t('authModal.email')} type="email" name="email" value={formData.email} onChange={handleChange} required />
+            {showSignup && <TextField label={t('authModal.confirmEmail')} type="email" name="confirmEmail" value={formData.confirmEmail} onChange={handleChange} required />}
+            <TextField label={t('authModal.password')} type="password" name="password" value={formData.password} onChange={handleChange} required />
+            <Button type="submit" variant="contained" color="primary" fullWidth>{showSignup ? t('authModal.signUp') : t('authModal.login')}</Button>
           </Box>
           <Typography sx={{ mt: 2, cursor: 'pointer', color: 'primary.main', textDecoration: 'underline' }}
             onClick={() => setShowSignup(!showSignup)}>
-            {showSignup ? "Returning? Log Into Your Existing Account" : "New? Create A New Account"}
+            {showSignup ? t('authModal.returningUser') : t('authModal.newUser')}
           </Typography>
         </Box>
       </DialogContent>
