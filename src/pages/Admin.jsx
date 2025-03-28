@@ -56,118 +56,6 @@ const Admin = () => {
     "Content-Type": "application/json"
   });
 
-  // Fetch all users
-  const fetchUsers = async () => {
-    try {
-      const res = await fetch(`${backendUrl}/api/admin/getUsers`, {
-        method: "GET",
-        headers: getHeaders(),
-        credentials: "include",
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to fetch users");
-      }
-
-      setUsers(Array.isArray(data) ? data : []);
-    } catch (err) {
-      setError(`Error fetching users: ${err.message}`);
-      console.error("Error fetching users:", err);
-    }
-  };
-
-  // Fetch a specific user by ID
-  const fetchUserById = async (userId) => {
-    try {
-      setLoading(true);
-      const res = await fetch(`${backendUrl}/api/admin/getUser/${userId}`, {
-        method: "GET",
-        headers: getHeaders(),
-        credentials: "include",
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to fetch user");
-      }
-
-      setSelectedUser(data);
-      setUserFormData({
-        name: data.name || "",
-        email: data.email || "",
-        role: data.role || "user"
-      });
-      
-      setOpenEditDialog(true);
-    } catch (err) {
-      setError(`Error fetching user: ${err.message}`);
-      console.error("Error fetching user:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Update user
-  const updateUser = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(`${backendUrl}/api/admin/updateUser/${selectedUser.id}`, {
-        method: "PUT",
-        headers: getHeaders(),
-        credentials: "include",
-        body: JSON.stringify(userFormData)
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to update user");
-      }
-
-      // Update the users list
-      setUsers(users.map(user => user.id === selectedUser.id ? { ...user, ...userFormData } : user));
-      setOpenEditDialog(false);
-      setStatusMessage({ message: "User updated successfully", type: "success" });
-      
-      // Refresh user list
-      fetchUsers();
-    } catch (err) {
-      setError(`Error updating user: ${err.message}`);
-      console.error("Error updating user:", err);
-      setStatusMessage({ message: `Error updating user: ${err.message}`, type: "error" });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Delete user
-  const deleteUser = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(`${backendUrl}/api/admin/deleteUser/${selectedUser.id}`, {
-        method: "DELETE",
-        headers: getHeaders(),
-        credentials: "include",
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to delete user");
-      }
-
-      // Remove user from the list
-      setUsers(users.filter(user => user.id !== selectedUser.id));
-      setOpenDeleteDialog(false);
-      setStatusMessage({ message: "User deleted successfully", type: "success" });
-    } catch (err) {
-      setError(`Error deleting user: ${err.message}`);
-      console.error("Error deleting user:", err);
-      setStatusMessage({ message: `Error deleting user: ${err.message}`, type: "error" });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Fetch API statistics
   const fetchApiStatistics = async () => {
     try {
@@ -189,6 +77,127 @@ const Admin = () => {
     } catch (err) {
       setError(`Error fetching API stats: ${err.message}`);
       console.error("Error fetching API stats:", err);
+    }
+  };
+
+  // Fetch all users and refresh API statistics
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch(`${backendUrl}/api/admin/getUsers`, {
+        method: "GET",
+        headers: getHeaders(),
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to fetch users");
+      }
+
+      setUsers(Array.isArray(data) ? data : []);
+      
+      // Refresh API statistics after fetching users
+      await fetchApiStatistics();
+    } catch (err) {
+      setError(`Error fetching users: ${err.message}`);
+      console.error("Error fetching users:", err);
+    }
+  };
+
+  // Fetch a specific user by ID and refresh API statistics
+  const fetchUserById = async (userId) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${backendUrl}/api/admin/getUser/${userId}`, {
+        method: "GET",
+        headers: getHeaders(),
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to fetch user");
+      }
+
+      setSelectedUser(data);
+      setUserFormData({
+        name: data.name || "",
+        email: data.email || "",
+        role: data.role || "user"
+      });
+      
+      // Refresh API statistics after fetching user
+      await fetchApiStatistics();
+      
+      setOpenEditDialog(true);
+    } catch (err) {
+      setError(`Error fetching user: ${err.message}`);
+      console.error("Error fetching user:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update user and refresh API statistics
+  const updateUser = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${backendUrl}/api/admin/updateUser/${selectedUser.id}`, {
+        method: "PUT",
+        headers: getHeaders(),
+        credentials: "include",
+        body: JSON.stringify(userFormData)
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to update user");
+      }
+
+      // Update the users list
+      setUsers(users.map(user => user.id === selectedUser.id ? { ...user, ...userFormData } : user));
+      setOpenEditDialog(false);
+      setStatusMessage({ message: "User updated successfully", type: "success" });
+      
+      // Refresh user list and API statistics
+      await fetchUsers();
+    } catch (err) {
+      setError(`Error updating user: ${err.message}`);
+      console.error("Error updating user:", err);
+      setStatusMessage({ message: `Error updating user: ${err.message}`, type: "error" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete user and refresh API statistics
+  const deleteUser = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${backendUrl}/api/admin/deleteUser/${selectedUser.id}`, {
+        method: "DELETE",
+        headers: getHeaders(),
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to delete user");
+      }
+
+      // Remove user from the list
+      setUsers(users.filter(user => user.id !== selectedUser.id));
+      setOpenDeleteDialog(false);
+      setStatusMessage({ message: "User deleted successfully", type: "success" });
+      
+      // Refresh API statistics after deleting user
+      await fetchApiStatistics();
+    } catch (err) {
+      setError(`Error deleting user: ${err.message}`);
+      console.error("Error deleting user:", err);
+      setStatusMessage({ message: `Error deleting user: ${err.message}`, type: "error" });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -218,7 +227,7 @@ const Admin = () => {
       setLoading(true);
       setError("");
       try {
-        await Promise.all([fetchUsers(), fetchApiStatistics()]);
+        await fetchUsers(); // This will also fetch API statistics
       } catch (err) {
         setError(`Error initializing admin panel: ${err.message}`);
         console.error("Error initializing admin panel:", err);
@@ -263,8 +272,10 @@ const Admin = () => {
 
       {!loading && !error && (
         <Paper sx={{width: "100%", overflowX: "auto", mt: 2, p: 2, backgroundColor: 'transparent', boxShadow: 'none' }}>
+        
+          
           {/* Users Table */}
-          <Paper sx={{mb: 3, p: 2, fontWeight: "bold", color: "black"}} elevation={3}>
+          <Paper sx={{mb: 3, p: 2, color: "black"}} elevation={3}>
             <Typography variant="h6" gutterBottom>
               Users Management
             </Typography>
@@ -327,7 +338,7 @@ const Admin = () => {
           </Paper>
 
           {/* User Stats Table */}
-          <Paper sx={{mb: 3, p: 2, fontWeight: "bold", color: "black"}} elevation={3}>
+          <Paper sx={{mb: 3, p: 2, color: "black"}} elevation={3}>
             <Typography variant="h6" gutterBottom>
               User Statistics
             </Typography>
@@ -373,7 +384,7 @@ const Admin = () => {
           </Paper>
 
           {/* API Stats Table */}
-          <Paper sx={{mb: 3, p: 2, fontWeight: "bold", color: "black"}} elevation={3}>
+          <Paper sx={{p: 2, color: "black"}} elevation={3}>
             <Typography variant="h6" gutterBottom>
               API Usage Statistics
             </Typography>
@@ -422,7 +433,7 @@ const Admin = () => {
 
       {/* Edit User Dialog */}
       <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
-        <DialogTitle>Edit User</DialogTitle>
+        <DialogTitle sx={{color: "black"}}>Edit User</DialogTitle>
         <DialogContent>
           <Box component="form" sx={{ mt: 2 }}>
             <TextField
@@ -433,7 +444,7 @@ const Admin = () => {
               value={userFormData.name}
               onChange={handleInputChange}
               variant="outlined"
-              sx={{ mb: 2 }}
+              sx={{ mb: 2, input: { color: "black" } }}
             />
             <TextField
               margin="dense"
@@ -444,7 +455,7 @@ const Admin = () => {
               value={userFormData.email}
               onChange={handleInputChange}
               variant="outlined"
-              sx={{ mb: 2 }}
+              sx={{ mb: 2, input: { color: "black" } }}
             />
             <FormControl fullWidth>
               <InputLabel id="role-select-label">Role</InputLabel>
@@ -454,9 +465,10 @@ const Admin = () => {
                 value={userFormData.role}
                 label="Role"
                 onChange={handleInputChange}
+                sx={{ color: "black" }}
               >
-                <MenuItem value="user">User</MenuItem>
-                <MenuItem value="admin">Admin</MenuItem>
+                <MenuItem value="user" sx={{ color: "black" }}>User</MenuItem>
+                <MenuItem value="admin" sx={{ color: "black" }}>Admin</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -469,9 +481,9 @@ const Admin = () => {
 
       {/* Delete User Dialog */}
       <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-        <DialogTitle sx={{ color: "red" }}>Confirm Delete</DialogTitle>
+        <DialogTitle sx={{color: "red"}}>Confirm Delete</DialogTitle>
         <DialogContent>
-          <Typography sx={{ color: "black" }}>
+          <Typography sx={{color: "black"}}>
             Are you sure you want to delete user "{selectedUser?.name}"? This action cannot be undone.
           </Typography>
         </DialogContent>
@@ -480,7 +492,6 @@ const Admin = () => {
           <Button onClick={deleteUser} color="error">Delete</Button>
         </DialogActions>
       </Dialog>
-
     </Box>
   );
 };
