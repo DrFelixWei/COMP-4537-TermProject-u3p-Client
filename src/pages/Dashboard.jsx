@@ -19,7 +19,7 @@ import {styled} from "@mui/material/styles";
 import Card from "../components/Card/Card.jsx";
 import PDFUpload from "../components/PDFUpload/PDFUpload";
 import {useAuthUser} from "react-auth-kit";
-import APIUsage from "../components/API/apiUsage.jsx";
+import APIUsage from "../components/API/APIUsage.jsx";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
