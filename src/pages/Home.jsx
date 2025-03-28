@@ -7,8 +7,12 @@ const Home = () => {
   const { t } = useTranslation();
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" width="100%">
+    <Box display="flex" flexDirection="column" alignItems="center" width="100%" p={2}>
       <Typography variant="h3" component="h1">{t('home')}</Typography>
+
+      <Box mt={2}>
+        <img src="/logo.png" alt="Logo" width={400} height="auto" />
+      </Box>
 
 
     </Box>

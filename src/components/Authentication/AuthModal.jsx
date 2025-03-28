@@ -64,24 +64,6 @@ const AuthModal = ({ isOpen, setIsOpen }) => {
     }
   };
 
-  const handleTestLogin = (role) => {
-    const testUser = {
-      id: role === "admin" ? 1 : 2,
-      name: role === "admin" ? "Admin User" : "Test User",
-      role: role,
-    };
-
-    signIn({
-      token: "test-token",
-      expiresIn: 3600,
-      tokenType: "Bearer",
-      authState: testUser,
-    });
-
-    navigate(role === "admin" ? "/admin" : "/dashboard");
-    setIsOpen(false);
-  };
-
   return (
     <Dialog open={isOpen} onClose={() => setIsOpen(false)} maxWidth="sm"
       PaperProps={{ sx: { backgroundColor: theme.palette.background.secondary, color: theme.palette.text.primary } }}>
@@ -98,10 +80,6 @@ const AuthModal = ({ isOpen, setIsOpen }) => {
             {showSignup && <TextField label="Confirm Email" type="email" name="confirmEmail" value={formData.confirmEmail} onChange={handleChange} required />}
             <TextField label="Password" type="password" name="password" value={formData.password} onChange={handleChange} required />
             <Button type="submit" variant="contained" color="primary" fullWidth>{showSignup ? "Sign Up" : "Login"}</Button>
-          </Box>
-          <Box display="flex" justifyContent="center" gap={2} mt={2}>
-            <Button variant="contained" color="secondary" onClick={() => handleTestLogin("user")}>TEST USER LOGIN</Button>
-            <Button variant="contained" color="secondary" onClick={() => handleTestLogin("admin")}>TEST ADMIN LOGIN</Button>
           </Box>
           <Typography sx={{ mt: 2, cursor: 'pointer', color: 'primary.main', textDecoration: 'underline' }}
             onClick={() => setShowSignup(!showSignup)}>
