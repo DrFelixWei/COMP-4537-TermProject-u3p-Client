@@ -469,9 +469,9 @@ const Admin = () => {
 
       {/* Delete User Dialog */}
       <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle sx={{ color: "red" }}>Confirm Delete</DialogTitle>
         <DialogContent>
-          <Typography>
+          <Typography sx={{ color: "black" }}>
             Are you sure you want to delete user "{selectedUser?.name}"? This action cannot be undone.
           </Typography>
         </DialogContent>
@@ -480,6 +480,7 @@ const Admin = () => {
           <Button onClick={deleteUser} color="error">Delete</Button>
         </DialogActions>
       </Dialog>
+
     </Box>
   );
 };
