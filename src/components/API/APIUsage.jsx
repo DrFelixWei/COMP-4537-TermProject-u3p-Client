@@ -1,9 +1,9 @@
+// ChatGPT was used to aid in the creation of this code.
+
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, LinearProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
-
-const MAX_USAGE = 20;
 
 const UsageContainer = styled(Box)({
   position: 'relative',

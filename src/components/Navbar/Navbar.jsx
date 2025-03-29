@@ -1,3 +1,5 @@
+// ChatGPT was used to aid in the creation of this code.
+
 import { useAuthUser } from "react-auth-kit";
 import { Link } from "react-router-dom";
 import Logout from "../Authentication/Logout";

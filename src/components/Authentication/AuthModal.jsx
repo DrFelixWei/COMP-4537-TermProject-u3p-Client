@@ -1,3 +1,5 @@
+// ChatGPT was used to aid in the creation of this code.
+
 import React, { useState } from 'react';
 import { useSignIn } from 'react-auth-kit';
 import { useNavigate } from 'react-router-dom';
