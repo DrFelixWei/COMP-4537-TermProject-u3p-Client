@@ -25,7 +25,7 @@ import {styled} from "@mui/material/styles";
 import Card from "../components/Card/Card.jsx";
 import PDFUpload from "../components/PDFUpload/PDFUpload";
 import {useAuthUser} from "react-auth-kit";
-import APIUsage from "../components/api/v1/APIUsage.jsx";
+import APIUsage from "../components/API/APIUsage.jsx";
 import { useTranslation } from 'react-i18next';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
