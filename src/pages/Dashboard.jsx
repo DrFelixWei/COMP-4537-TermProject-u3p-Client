@@ -385,9 +385,24 @@ const Dashboard = () => {
                       </MenuItem>
                     ))}
                   </Select>
+                  <Box>
+                  <IconButton
+                    color="primary"
+                    onClick={handleEditClick}
+                    disabled={!selectedDeckId}
+                    sx={{
+                      color: "white",
+                      "&:hover": {backgroundColor: "rgba(33, 150, 243, 0.1)"},
+                      mr: 1
+                    }}
+                    aria-label="edit"
+                  >
+                    <EditIcon />
+                  </IconButton>
                   <IconButton
                     color="error"
                     onClick={handleDeleteDeck}
+                    disabled={!selectedDeckId}
                     sx={{
                       color: "white",
                       "&:hover": {backgroundColor: "rgba(255, 0, 0, 0.1)"},
@@ -397,6 +412,7 @@ const Dashboard = () => {
                     <DeleteIcon />
                   </IconButton>
                 </Box>
+              </Box>
               </FormControl>
             </StyledPaper>
           )}
