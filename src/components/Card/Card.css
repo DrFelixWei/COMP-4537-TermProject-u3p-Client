@@ -27,9 +27,11 @@
 }
 
 .card-face.front {
-    z-index: 2; /* Ensure front is on top */
+    backface-visibility: hidden;
+    
 }
 
 .card-face.back {
     transform: rotateY(180deg); /* Rotate back face for flipping */
+    backface-visibility: hidden;
 }
