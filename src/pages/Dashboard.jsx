@@ -25,7 +25,7 @@ import {styled} from "@mui/material/styles";
 import Card from "../components/Card/Card.jsx";
 import PDFUpload from "../components/PDFUpload/PDFUpload";
 import {useAuthUser} from "react-auth-kit";
-import APIUsage from "../components/API/APIUsage.jsx";
+import APIUsage from "../components/api/v1/APIUsage.jsx";
 import { useTranslation } from 'react-i18next';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
@@ -73,7 +73,7 @@ const Dashboard = () => {
 
   const fetchAPIUsage = async () => {
     try {
-      const response = await fetch(`${backendUrl}/api/users/getApiUsage/${userId}`);
+      const response = await fetch(`${backendUrl}/api/v1/users/getApiUsage/${userId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch user's API usage");
       }
@@ -124,7 +124,7 @@ const Dashboard = () => {
     try {
       console.log("Fetching decks for:", userEmail);
       const response = await fetch(
-        `${backendUrl}/api/flashcards/decks/${userEmail}`
+        `${backendUrl}/api/v1/flashcards/decks/${userEmail}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch decks");
@@ -150,7 +150,7 @@ const Dashboard = () => {
     try {
       console.log("Fetching flashcards for deck:", deckId);
       const response = await fetch(
-        `${backendUrl}/api/flashcards/retrieve/${userEmail}?deckId=${deckId}`
+        `${backendUrl}/api/v1/flashcards/retrieve/${userEmail}?deckId=${deckId}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch flashcards");
@@ -189,7 +189,7 @@ const Dashboard = () => {
   const handleDeleteDeck = async () => {
     try {
       console.log("Deleting currently selected deck with ID: ", selectedDeckId);
-      const response = await fetch(`${backendUrl}/api/flashcards/delete/${selectedDeckId}/${userEmail}`,{
+      const response = await fetch(`${backendUrl}/api/v1/flashcards/delete/${selectedDeckId}/${userEmail}`,{
         method: "DELETE",
         headers: {
           "Content-Type": "application/json"
@@ -226,7 +226,7 @@ const Dashboard = () => {
 
   const handleSaveDeckName = async () => {
     try {
-      const response = await fetch(`${backendUrl}/api/flashcards/update/${selectedDeckId}/${userEmail}`, {
+      const response = await fetch(`${backendUrl}/api/v1/flashcards/update/${selectedDeckId}/${userEmail}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

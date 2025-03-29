@@ -23,7 +23,7 @@ const Logout = () => {
       }
 
       // Otherwise, call the actual logout API
-      await fetch(`${backendUrl}/api/auth/logout`, {
+      await fetch(`${backendUrl}/api/v1/auth/logout`, {
         method: "POST",
         credentials: "include",
       });

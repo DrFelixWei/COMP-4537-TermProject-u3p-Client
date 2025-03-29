@@ -61,7 +61,7 @@ const Admin = () => {
   // Fetch API statistics
   const fetchApiStatistics = async () => {
     try {
-      const res = await fetch(`${backendUrl}/api/admin/getApiStats`, {
+      const res = await fetch(`${backendUrl}/api/v1/admin/getApiStats`, {
         method: "GET",
         headers: getHeaders(),
         credentials: "include",
@@ -85,7 +85,7 @@ const Admin = () => {
   // Fetch all users and refresh API statistics
   const fetchUsers = async () => {
     try {
-      const res = await fetch(`${backendUrl}/api/admin/getUsers`, {
+      const res = await fetch(`${backendUrl}/api/v1/admin/getUsers`, {
         method: "GET",
         headers: getHeaders(),
         credentials: "include",
@@ -110,7 +110,7 @@ const Admin = () => {
   const fetchUserById = async (userId) => {
     try {
       setLoading(true);
-      const res = await fetch(`${backendUrl}/api/admin/getUser/${userId}`, {
+      const res = await fetch(`${backendUrl}/api/v1/admin/getUser/${userId}`, {
         method: "GET",
         headers: getHeaders(),
         credentials: "include",
@@ -144,7 +144,7 @@ const Admin = () => {
   const updateUser = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${backendUrl}/api/admin/updateUser/${selectedUser.id}`, {
+      const res = await fetch(`${backendUrl}/api/v1/admin/updateUser/${selectedUser.id}`, {
         method: "PUT",
         headers: getHeaders(),
         credentials: "include",
@@ -176,7 +176,7 @@ const Admin = () => {
   const deleteUser = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${backendUrl}/api/admin/deleteUser/${selectedUser.id}`, {
+      const res = await fetch(`${backendUrl}/api/v1/admin/deleteUser/${selectedUser.id}`, {
         method: "DELETE",
         headers: getHeaders(),
         credentials: "include",

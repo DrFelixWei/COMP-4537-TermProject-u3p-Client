@@ -41,7 +41,7 @@ const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
     setProgress(t('pdfUpload.uploading'));
 
     try {
-      const response = await fetch(`${backendUrl}/api/flashcards/create`, {
+      const response = await fetch(`${backendUrl}/api/v1/flashcards/create`, {
         method: 'POST',
         body: formData,
       });

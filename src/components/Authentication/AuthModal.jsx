@@ -38,7 +38,7 @@ const AuthModal = ({ isOpen, setIsOpen }) => {
     }
 
     try {
-      const endpoint = showSignup ? "/api/users/register" : "/api/users/login";
+      const endpoint = showSignup ? "/api/v1/users/register" : "/api/v1/users/login";
       const body = showSignup ? 
         { name: formData.name, email: formData.email, password: formData.password } 
         : 
