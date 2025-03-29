@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from 'react-i18next';
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const AuthModal = ({ isOpen, setIsOpen }) => {
   const { t } = useTranslation();

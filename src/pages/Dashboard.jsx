@@ -28,7 +28,7 @@ import {useAuthUser} from "react-auth-kit";
 import APIUsage from "../components/API/APIUsage.jsx";
 import { useTranslation } from 'react-i18next';
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const StyledPaper = styled(Paper)(({theme}) => ({
   padding: theme.spacing(3),
