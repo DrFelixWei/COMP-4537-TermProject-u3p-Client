@@ -54,7 +54,7 @@ const APIUsage = ({
           <UsageBar 
             variant="determinate" 
             value={Math.min(usagePercentage, 100)} 
-            color={usageColor} // Set color dynamically here
+            color={usageColor} 
           />
           <UsageText variant="body1">
             {apiUsage} / {MAX_USAGE}

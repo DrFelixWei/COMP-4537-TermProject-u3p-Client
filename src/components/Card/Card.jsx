@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import sfxFlip from './sfx_card_flip_2.mp3';
 import './Card.css';
+import { useTranslation } from 'react-i18next';
 
 const Card = ({
     length = 336,
@@ -12,6 +13,7 @@ const Card = ({
     value,
     flipTimer, 
 }) => {
+    const { t } = useTranslation();
     const [isFaceActive, setIsFaceActive] = useState(true);
     const [isFlippingAnimation, setIsFlippingAnimation] = useState(false);
     const autoFlipTimerRef = useRef(null); // Ref to track the auto-flip timeout
@@ -88,7 +90,7 @@ const Card = ({
                 >
                     {value && value.front && (
                         <div className="card-content">
-                            <h3 style={{ color: 'white', marginBottom: '10px' }}>Question</h3>
+                            <h3 style={{ color: 'white', marginBottom: '10px' }}>{t('card.question')}</h3>
                             <p style={{ color: 'white', fontSize: '16px' }}>{value.front}</p>
                         </div>
                     )}
@@ -113,7 +115,7 @@ const Card = ({
                 >
                     {value && value.back && (
                         <div className="card-content">
-                            <h3 style={{ color: 'white', marginBottom: '10px' }}>Answer</h3>
+                            <h3 style={{ color: 'white', marginBottom: '10px' }}>{t('card.answer')}</h3>
                             <p style={{ color: 'white', fontSize: '16px' }}>{value.back}</p>
                         </div>
                     )}

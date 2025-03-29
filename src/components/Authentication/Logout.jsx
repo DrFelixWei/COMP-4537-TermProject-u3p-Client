@@ -1,10 +1,12 @@
 import { useSignOut, useAuthUser } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const Logout = () => {
+  const { t } = useTranslation();
   const signOut = useSignOut();
   const navigate = useNavigate();
   const auth = useAuthUser();
@@ -35,7 +37,7 @@ const Logout = () => {
 
   return (
     <Button variant="contained" color="secondary" onClick={handleLogout}>
-      Logout
+      {t('navbar.logout')}
     </Button>
   );
 };

@@ -3,10 +3,12 @@
 import React, { useState } from 'react';
 import { Box, Typography, Button, LinearProgress, Alert, AlertTitle } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
+import { useTranslation } from 'react-i18next';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
+  const { t } = useTranslation();
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -20,7 +22,7 @@ const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
     } else {
       setSelectedFile(null);
       setError({
-        message: 'Please select a valid PDF file',
+        message: t('pdfUpload.errorInvalidFile'),
         step: 'validation',
         status: 400
       });
@@ -34,14 +36,11 @@ const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
     formData.append('pdfFile', selectedFile);
     formData.append('email', userEmail);
     
-    // The filename will be used as the deck name on the server
-
     setIsLoading(true);
     setError(null);
-    setProgress('Uploading PDF...');
+    setProgress(t('pdfUpload.uploading'));
 
     try {
-      console.log("Backend URL:", backendUrl);
       const response = await fetch(`${backendUrl}/api/flashcards/create`, {
         method: 'POST',
         body: formData,
@@ -51,14 +50,13 @@ const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
       
       if (!response.ok) {
         throw {
-          message: data.error || 'Failed to process flashcards',
+          message: data.error || t('pdfUpload.errorProcessing'),
           step: data.step || 'unknown',
           status: response.status
         };
       }
       
-      setProgress('Flashcards created successfully!');
-      console.log("Flashcards created:", data);
+      setProgress(t('pdfUpload.success'));
       
       if (onFlashcardsGenerated) {
         onFlashcardsGenerated(data.flashCards, {
@@ -67,11 +65,8 @@ const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
         });
       }
     } catch (err) {
-      console.error('Error generating flashcards:', err);
-      
-      // Handle both structured API errors and network/parsing errors
       setError({
-        message: err.message || 'Failed to generate flashcards',
+        message: err.message || t('pdfUpload.errorGenerate'),
         step: err.step || 'unknown',
         status: err.status || 500
       });
@@ -80,18 +75,17 @@ const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
     }
   };
 
-  // Helper function to get user-friendly error step descriptions
   const getErrorStepDescription = (step) => {
     const descriptions = {
-      'validation': 'Input validation',
-      'pdf_extraction': 'PDF text extraction',
-      'ai_generation': 'AI processing',
-      'user_verification': 'User account verification',
-      'database': 'Database storage',
-      'unknown': 'Unknown step'
+      'validation': t('pdfUpload.validationStep'),
+      'pdf_extraction': t('pdfUpload.pdfExtractionStep'),
+      'ai_generation': t('pdfUpload.aiGenerationStep'),
+      'user_verification': t('pdfUpload.userVerificationStep'),
+      'database': t('pdfUpload.databaseStep'),
+      'unknown': t('pdfUpload.unknownStep')
     };
     
-    return descriptions[step] || 'Processing';
+    return descriptions[step] || t('pdfUpload.processingStep');
   };
 
   return (
@@ -131,13 +125,13 @@ const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
               }
             }}
           >
-            Select PDF
+            {t('pdfUpload.selectPdf')}
           </Button>
         </label>
         
         {selectedFile && (
           <Typography variant="body1" sx={{ mt: 2, color: darkMode ? 'white' : 'text.primary' }}>
-            Selected file: {selectedFile.name}
+            {t('pdfUpload.selectedFile', { filename: selectedFile.name })}
           </Typography>
         )}
         
@@ -155,7 +149,7 @@ const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
               }
             }}
           >
-            Generate Flashcards
+            {t('pdfUpload.generateFlashcards')}
           </Button>
         )}
       </Box>
@@ -184,7 +178,7 @@ const PDFUpload = ({ userEmail, onFlashcardsGenerated, darkMode = false }) => {
             border: darkMode ? '1px solid rgba(211, 47, 47, 0.3)' : undefined
           }}
         >
-          <AlertTitle>Error during {getErrorStepDescription(error.step)}</AlertTitle>
+          <AlertTitle>{t('pdfUpload.errorTitle', { step: getErrorStepDescription(error.step) })}</AlertTitle>
           {error.message}
         </Alert>
       )}
