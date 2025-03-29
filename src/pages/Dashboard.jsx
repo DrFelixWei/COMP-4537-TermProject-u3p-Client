@@ -13,8 +13,14 @@ import {
   FormControl,
   InputLabel,
   IconButton,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle
 } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import {styled} from "@mui/material/styles";
 import Card from "../components/Card/Card.jsx";
 import PDFUpload from "../components/PDFUpload/PDFUpload";
@@ -57,6 +63,11 @@ const Dashboard = () => {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [apiUsage, setAPIUsage] = useState(0);
   const MAX_USAGE = 20;
+  
+  // Dialog state
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [newDeckName, setNewDeckName] = useState("");
+  const [statusMessage, setStatusMessage] = useState({ message: "", type: "" });
 
   const fetchAPIUsage = async () => {
     try {
@@ -72,10 +83,10 @@ const Dashboard = () => {
       console.error("Error fetching user's API usage:", error);
     }
   };
+  
   useEffect(() => {
     fetchAPIUsage();
   }, []);
-
 
   const handleFlashcardsGenerated = (newFlashcards, deckInfo) => {
     console.log("New flashcards generated:", newFlashcards);
@@ -186,11 +197,66 @@ const Dashboard = () => {
         throw new Error("Failed to delete deck");
       }
       console.log("Deck deleted successfully");
-    setDecks((prevDecks) => prevDecks.filter(deck => deck.id !== selectedDeckId));
-  } catch (error){
-    console.error("Error deleting deck: ", error.message);
-  }
-};
+      setDecks((prevDecks) => prevDecks.filter(deck => deck.id !== selectedDeckId));
+      setStatusMessage({ message: "Deck deleted successfully", type: "success" });
+      
+      // Auto-dismiss success message after 3 seconds
+      setTimeout(() => {
+        setStatusMessage({ message: "", type: "" });
+      }, 3000);
+    } catch (error){
+      console.error("Error deleting deck: ", error.message);
+      setStatusMessage({ message: `Error deleting deck: ${error.message}`, type: "error" });
+    }
+  };
+
+  const handleEditClick = () => {
+    const currentDeck = decks.find(deck => deck.id === selectedDeckId);
+    if (currentDeck) {
+      setNewDeckName(currentDeck.name);
+      setEditDialogOpen(true);
+    }
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditDialogOpen(false);
+  };
+
+  const handleSaveDeckName = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/api/flashcards/update/${selectedDeckId}/${userEmail}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ newDeckName }),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to update deck name");
+      }
+      
+      // Update the local deck list with the new name
+      setDecks(prevDecks => 
+        prevDecks.map(deck => 
+          deck.id === selectedDeckId 
+            ? { ...deck, name: newDeckName } 
+            : deck
+        )
+      );
+      
+      setEditDialogOpen(false);
+      setStatusMessage({ message: "Deck name updated successfully", type: "success" });
+      
+      // Auto-dismiss success message after 3 seconds
+      setTimeout(() => {
+        setStatusMessage({ message: "", type: "" });
+      }, 3000);
+    } catch (error) {
+      console.error("Error updating deck name:", error);
+      setStatusMessage({ message: `Error updating deck name: ${error.message}`, type: "error" });
+    }
+  };
 
   // Get current flashcard data
   const currentFlashcard =
@@ -218,6 +284,20 @@ const Dashboard = () => {
           Dashboard
         </Typography>
 
+        {statusMessage.message && (
+          <Paper
+            sx={{
+              width: "100%",
+              mb: 2,
+              p: 2,
+              backgroundColor: statusMessage.type === "success" ? "rgba(76, 175, 80, 0.3)" : "rgba(255, 0, 0, 0.3)",
+              color: "white"
+            }}
+          >
+            <Typography>{statusMessage.message}</Typography>
+          </Paper>
+        )}
+
         <APIUsage apiUsage={apiUsage} MAX_USAGE={MAX_USAGE}/>
 
         { apiUsage >= MAX_USAGE &&
@@ -239,7 +319,6 @@ const Dashboard = () => {
           </Typography>
         </StyledPaper>
         }
-
 
         { apiUsage < MAX_USAGE &&  
         <StyledPaper elevation={3} sx={{width: "100%"}}>
@@ -317,17 +396,33 @@ const Dashboard = () => {
                     </MenuItem>
                   ))}
                 </Select>
-                <IconButton
-                  color="error"
-                  onClick={handleDeleteDeck}
-                  sx={{
-                    color: "white",
-                    "&:hover": {backgroundColor: "rgba(255, 0, 0, 0.1)"},
-                  }}
-                  aria-label="delete"
-                >
-                  <DeleteIcon />
-                </IconButton>
+                <Box>
+                  <IconButton
+                    color="primary"
+                    onClick={handleEditClick}
+                    disabled={!selectedDeckId}
+                    sx={{
+                      color: "white",
+                      "&:hover": {backgroundColor: "rgba(33, 150, 243, 0.1)"},
+                      mr: 1
+                    }}
+                    aria-label="edit"
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    onClick={handleDeleteDeck}
+                    disabled={!selectedDeckId}
+                    sx={{
+                      color: "white",
+                      "&:hover": {backgroundColor: "rgba(255, 0, 0, 0.1)"},
+                    }}
+                    aria-label="delete"
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
               </Box>
             </FormControl>
           </StyledPaper>
@@ -412,6 +507,67 @@ const Dashboard = () => {
           )}
         </StyledPaper>
       </Box>
+
+      {/* Edit Deck Name Dialog */}
+      <Dialog 
+        open={editDialogOpen} 
+        onClose={handleCloseEditDialog}
+        PaperProps={{
+          sx: {
+            backgroundColor: "#1e1e1e",
+            color: "white",
+            borderRadius: 2,
+            minWidth: "350px"
+          }
+        }}
+      >
+        <DialogTitle>Edit Deck Name</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Deck Name"
+            fullWidth
+            variant="outlined"
+            value={newDeckName}
+            onChange={(e) => setNewDeckName(e.target.value)}
+            InputLabelProps={{
+              sx: { color: "rgba(255, 255, 255, 0.7)" }
+            }}
+            InputProps={{
+              sx: { 
+                color: "white",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "rgba(255, 255, 255, 0.3)"
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "rgba(255, 255, 255, 0.5)"
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "white"
+                }
+              }
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEditDialog} sx={{ color: "white" }}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleSaveDeckName} 
+            sx={{ 
+              backgroundColor: "#4caf50", 
+              color: "white",
+              "&:hover": {
+                backgroundColor: "#388e3c",
+              }
+            }}
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
