@@ -478,7 +478,7 @@ const Admin = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEditDialog(false)}>{t('Cacnel')}</Button>
+          <Button onClick={() => setOpenEditDialog(false)}>{t('Cancel')}</Button>
           <Button onClick={updateUser} color="primary">{t('Save')}</Button>
         </DialogActions>
       </Dialog>
